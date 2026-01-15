@@ -1,0 +1,15 @@
+BƯỚC 2: CÀI ĐẶT TRÊN IPHONE
+
+1.  Mở iPhone, vào tin nhắn lấy link vừa gửi, bấm vào để mở bằng trình duyệt **Safari**.
+2.  Đợi web load xong.
+3.  Nhìn xuống dưới cùng trình duyệt, bấm nút **Chia sẻ** (Biểu tượng hình vuông có mũi tên đi lên ⬆️).
+4.  Cuộn xuống dưới, tìm và chọn dòng **"Thêm vào MH chính" (Add to Home Screen)**.
+    *   *Biểu tượng hình dấu cộng (+) trong ô vuông.*
+5.  Nhập tên App muốn hiện (Ví dụ: `Lịch Trực`).
+6.  Bấm nút **Thêm (Add)** ở góc trên bên phải.
+
+## ✅ KẾT QUẢ
+
+*   Trên màn hình chính iPhone sẽ xuất hiện Icon **Lịch Trực** (hình Logo bệnh viện).
+*   Khi bấm vào, App sẽ mở ra **Full màn hình** (không còn thanh địa chỉ Safari), trông y hệt App xịn.
+*   **Đặc biệt:** App này có chức năng **Offline**, tức là tắt mạng vẫn mở ra xem lịch được

@@ -1,0 +1,739 @@
+:root {
+    --primary-color: #0f172a;
+    --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    --accent-color: #3b82f6;
+    --bg-color: #f1f5f9;
+    --sidebar-bg: #ffffff;
+    --text-color: #334155;
+    --text-heading: #1e293b;
+    --border-color: #e2e8f0;
+    --table-header-bg: #f8fafc;
+    --highlight-bg: #eff6ff;
+    --sunday-color: #ef4444;
+    --saturday-color: #3b82f6;
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --radius: 8px;
+    /* Slightly reducing radius */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    height: 100vh;
+    overflow: hidden;
+    font-size: 13px;
+    /* Reduced from 14px */
+}
+
+/* Layout Framework */
+.app-container {
+    display: flex;
+    height: 100%;
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: 260px;
+    /* Reduced from 300px */
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 20;
+    box-shadow: var(--shadow-sm);
+}
+
+.brand {
+    padding: 1rem;
+    /* Reduced padding */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--primary-gradient);
+    color: white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand-logo {
+    width: 60px;
+    /* Reduced from 80px */
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.hospital-name {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+.dept-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.app-name {
+    margin-top: 0.25rem;
+    font-size: 1.1rem;
+    /* Reduced */
+    font-weight: 800;
+    color: #fbbf24;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-content {
+    padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: var(--text-heading);
+    font-size: 0.8rem;
+}
+
+input[type="date"],
+textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    outline: none;
+    transition: all 0.2s;
+    background-color: #f8fafc;
+}
+
+input[type="date"]:focus,
+textarea:focus {
+    border-color: var(--accent-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+textarea {
+    min-height: 200px;
+    /* Reduced to ~10 lines */
+    line-height: 1.5;
+}
+
+.hint {
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* Buttons */
+.primary-btn {
+    width: 100%;
+    padding: 0.6rem;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.1s;
+    font-size: 0.85rem;
+}
+
+.primary-btn:hover {
+    transform: translateY(-1px);
+}
+
+.secondary-btn {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: white;
+    border: 1px solid #cbd5e1;
+    color: var(--text-heading);
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+}
+
+.secondary-btn:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.month-nav button {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-heading);
+    font-weight: bold;
+}
+
+.month-nav button:hover {
+    background-color: #f1f5f9;
+}
+
+.month-nav span {
+    font-weight: 700;
+    color: var(--accent-color);
+    font-size: 0.9rem;
+}
+
+.credits {
+    margin-top: auto;
+    margin-bottom: 3rem;
+    /* Lift up from bottom */
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-heading);
+    font-weight: 600;
+}
+
+.credits span {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 1rem;
+    /* Compact size */
+    font-weight: 900;
+    line-height: 1.4;
+    /* Increased to show accents */
+    padding-bottom: 0.2rem;
+    /* Avoid clipping */
+    background: linear-gradient(to right, #ff0000, #ffa500, #ffd700, #32cd32, #00bfff, #9370db, #ff69b4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+.credit-link {
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+.credit-link:hover {
+    transform: scale(1.05);
+    /* Slight zoom on hover */
+}
+
+.zalo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    background-color: white;
+    color: #0068ff;
+    border: 1px solid #0068ff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.zalo-btn:hover {
+    background-color: #0068ff;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 104, 255, 0.2);
+}
+
+.zalo-btn:hover .zalo-icon path {
+    fill: white;
+}
+
+.zalo-btn:hover .zalo-icon text {
+    fill: #0068ff;
+}
+
+.zalo-icon {
+    width: 24px;
+    height: 24px;
+    transition: all 0.2s;
+}
+
+/* --- MAIN CONTENT --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    /* Reduced padding */
+    background-color: var(--bg-color);
+}
+
+.main-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.top-bar {
+    background: var(--primary-gradient);
+    padding: 0.75rem 1.5rem;
+    /* Reduced */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+.top-bar h2 {
+    font-size: 1.2rem;
+    /* Reduced */
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    padding: 0.3rem 0.8rem;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #f8fafc;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+th {
+    padding: 0.8rem 1rem;
+    /* Tighter padding */
+    text-align: left;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e2e8f0;
+    background-color: #f8fafc;
+}
+
+td {
+    padding: 0.6rem 1rem;
+    /* Tighter padding */
+    border-bottom: 1px solid #e2e8f0;
+    color: var(--text-heading);
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+/* Columns */
+.col-time {
+    width: 20%;
+    /* Equal width */
+    color: #475569;
+    font-size: 0.85rem;
+    text-align: center;
+    /* Center align time too per user request for "equal" look? Or keep left? Usually time is left. Let's keep left but width equal. User said "Khoảng cách đều nhau". */
+    text-align: left;
+    padding-left: 1rem;
+    /* Ensure some spacing */
+}
+
+.col-shift {
+    width: 20%;
+    /* 20% * 4 = 80% + 20% = 100% */
+    font-size: 0.9rem;
+}
+
+/* Rows */
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: #f8fafc;
+}
+
+/* Highlights */
+tr.is-today {
+    background-color: #dcfce7;
+}
+
+tr.is-today td {
+    color: #15803d;
+    /* dark green */
+    background-color: #dcfce7;
+    position: relative;
+    font-weight: bold;
+}
+
+tr.is-today .col-time::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: #16a34a;
+    /* green accent */
+}
+
+/* Weekend Styling */
+tr.is-sunday .col-time {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+tr.is-sunday {
+    background-color: #fee2e2;
+}
+
+tr.is-saturday .col-time {
+    color: var(--saturday-color);
+}
+
+/* Holidays */
+tr.is-holiday .col-time {
+    color: #991b1b !important;
+    font-weight: 800;
+}
+
+tr.is-holiday {
+    background-color: #fecaca !important;
+    border-left: 4px solid #ef4444;
+}
+
+.holiday-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #dc2626;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-top: 1px;
+}
+
+.empty-slot {
+    color: #cbd5e1;
+    font-weight: 300;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Header / Top Bar Adjustments */
+.top-bar {
+    background: var(--primary-gradient);
+    padding: 0.5rem 1.5rem;
+    /* Compact padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+    height: auto;
+    min-height: 70px;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.top-bar h2 {
+    font-size: 1.3rem;
+    /* Slightly larger heading */
+    margin-bottom: 0.2rem;
+}
+
+/* Rainbow Greeting */
+.greeting-text {
+    font-size: 0.9rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: linear-gradient(to right, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0088ff, #ff00ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 0px rgba(255, 255, 255, 0.9));
+    /* White hard shadow to make it pop against blue */
+    animation: rainbowMove 5s linear infinite;
+    white-space: nowrap;
+}
+
+@keyframes rainbowMove {
+    0% {
+        filter: hue-rotate(0deg) drop-shadow(0 2px 0px rgba(255, 255, 255, 0.9));
+    }
+
+    100% {
+        filter: hue-rotate(360deg) drop-shadow(0 2px 0px rgba(255, 255, 255, 0.9));
+    }
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Weather Widget */
+.weather-widget {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.weather-icon {
+    font-size: 1.5rem;
+}
+
+.weather-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1;
+}
+
+#temp {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #ffd700;
+    /* Gold */
+}
+
+/* Digital Clock */
+.digital-clock {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    /* White text */
+    background: rgba(0, 0, 0, 0.2);
+    /* Semi-transparent dark bg */
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.1em;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    min-width: 100px;
+    text-align: center;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 768px) {
+    body {
+        font-size: 12px;
+        /* Smaller base font */
+    }
+
+    .app-container {
+        flex-direction: column;
+        /* Stack vertically */
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0;
+    }
+
+    .brand {
+        flex-direction: row;
+        /* Horizontal logo/text */
+        padding: 0.5rem 1rem;
+        justify-content: space-between;
+        /* Space for toggle button */
+        text-align: left;
+        cursor: pointer;
+        /* Clickable */
+        user-select: none;
+    }
+
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .brand-text h1.hospital-name {
+        display: none;
+    }
+
+    /* Hide extra details to save space */
+    .brand-text .app-name {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    /* Fix iOS Zoom on Focus: Inputs must be at least 16px */
+    input,
+    textarea,
+    select,
+    button {
+        font-size: 16px !important;
+    }
+
+    /* Hide sidebar controls by default on mobile */
+    .sidebar-content {
+        display: none;
+        padding-top: 0;
+        background: #f8fafc;
+        max-height: 50vh;
+        /* Limit height */
+        box-shadow: inset 0 -4px 4px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-content.active {
+        display: flex;
+        /* Show when active */
+    }
+
+    /* Add a visible Toggle Button in CSS (controlled by JS) */
+    .brand::after {
+        content: '\f0c9';
+        /* FontAwesome Bars */
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: block;
+    }
+
+    .main-content {
+        padding: 0;
+        /* Maximize space */
+    }
+
+    .top-bar {
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-height: auto;
+    }
+
+    .header-left,
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .greeting-text {
+        font-size: 0.8rem;
+    }
+
+    th,
+    td {
+        padding: 0.4rem 0.2rem;
+        font-size: 0.75rem;
+    }
+
+    .col-time {
+        width: 15%;
+        /* Reduce time column width */
+        padding-left: 0.2rem;
+    }
+
+    .col-shift {
+        width: 21.25%;
+        /* Expand others */
+    }
+
+    .credits {
+        margin-bottom: 1rem;
+    }
+}

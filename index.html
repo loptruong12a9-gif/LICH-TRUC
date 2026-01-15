@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lịch Trực Y Cụ - BV Hồng Đức III</title>
+
+    <!-- PWA & Mobile Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lịch Trực">
+    <link rel="apple-touch-icon" href="logo.jpg">
+
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HTML2PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar for Settings -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="logo.jpg" alt="Logo" class="brand-logo" id="brandLogoImg">
+                <div class="brand-text">
+                    <div class="hospital-name">BỆNH VIỆN ĐK HỒNG ĐỨC III</div>
+                    <div class="dept-name">KHOA PT-GMHS</div>
+                    <div class="app-name">LỊCH TRỰC Y CỤ</div>
+                </div>
+            </div>
+
+            <!-- Sidebar Content (Always Visible for Viewing) -->
+            <div class="sidebar-content" id="sidebarMain">
+
+                <!-- Login for Admin Mode -->
+                <div id="loginPanel"
+                    style="padding: 0.5rem; background: #f1f5f9; border-radius: 6px; margin-bottom: 1rem; border: 1px dashed #cbd5e1;">
+                    <div style="display: flex; gap: 5px;">
+                        <input type="password" id="adminPassword" placeholder="Mật khẩu Admin..."
+                            style="flex:1; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem;">
+                        <button id="loginBtn"
+                            style="padding: 4px 8px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 0.8rem;">Mở</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="logoInput" style="cursor:not-allowed; color: #94a3b8; font-size: 0.8rem;">📂 Chọn Logo
+                        (Admin only)</label>
+                    <input type="file" id="logoInput" accept="image/*" style="display: none;" disabled>
+                </div>
+
+                <div class="control-group">
+                    <label for="startDate">Ngày Bắt Đầu Chu Kỳ</label>
+                    <input type="date" id="startDate" disabled style="background: #e2e8f0; cursor: not-allowed;">
+                    <p class="hint">Chọn ngày bắt đầu (Thứ 2 đầu tiên) của chu kỳ.</p>
+                </div>
+
+                <div class="control-group">
+                    <label for="staffInput">Danh Sách Nhân Viên</label>
+                    <textarea id="staffInput" disabled style="background: #e2e8f0; cursor: not-allowed;"
+                        placeholder="Nhập tên nhân viên theo cặp...&#10;Ví dụ:&#10;TÂN&#10;LỆ&#10;ĐÔNG&#10;ĐÀI..."></textarea>
+
+                    <!-- Save Button (Hidden by default) -->
+                    <button id="saveStaffBtn" class="primary-btn" style="display: none;">Lưu & Tạo Lịch</button>
+
+                    <p class="hint">*Nhập đúng thứ tự cặp để thuật toán chạy đúng.</p>
+                </div>
+
+                <div class="control-group">
+                    <label>Điều hướng tháng</label>
+                    <div class="month-nav">
+                        <button id="prevMonthBtn">&lt;</button>
+                        <span id="currentMonthLabel">...</span>
+                        <button id="nextMonthBtn">&gt;</button>
+                    </div>
+                </div>
+
+                <button id="todayBtn" class="secondary-btn">Về Tháng Hiện Tại</button>
+
+                <div class="credits">
+                    Phát triển bởi<br>
+                    <span>Tân Nguyễn</span>
+                    <a href="https://zalo.me/0367287102" target="_blank" class="zalo-btn">
+                        <!-- Zalo SVG Icon -->
+                        <svg class="zalo-icon" viewBox="0 0 50 50" width="24" height="24">
+                            <path fill="#0068FF"
+                                d="M25,2C12.317,2,2,10.655,2,21.328c0,4.37,1.727,8.42,4.686,11.605 c0.355,0.383,0.334,1.066-0.198,1.641l-2.071,2.234c-0.862,0.931-0.204,2.44,1.055,2.44h0.625c4.721,0,8.749-1.921,11.536-4.945 c2.253,0.672,4.689,1.025,7.368,1.025c12.683,0,23-8.655,23-19.328S37.683,2,25,2z" />
+                            <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="white"
+                                font-family="Arial, sans-serif" font-weight="900" font-size="16">Z</text>
+                        </svg>
+                        <span>Chat Zalo: 0367.287.102</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area with Card Design -->
+        <main class="main-content">
+            <div class="main-card">
+                <header class="top-bar">
+                    <div class="header-left">
+                        <h2 id="headerTitle">Tháng ...</h2>
+                        <div class="greeting-text">CHÚC BẠN NGÀY MỚI AN LÀNH VÀ HẠNH PHÚC</div>
+                        <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 2px; font-style: italic;">Phát triển
+                            bởi Tân Nguyễn</div>
+                    </div>
+
+                    <div class="header-right">
+                        <div id="weatherWidget" class="weather-widget">
+                            <span class="weather-icon">Checking...</span>
+                            <div class="weather-info">
+                                <span id="temp">--°C</span>
+                                <span id="location">Đang định vị...</span>
+                            </div>
+                        </div>
+                        <div class="legend">
+                            <div class="export-controls">
+                                <button id="exportWord" title="Xuất Word">🔵 Word</button>
+                                <button id="exportExcel" title="Xuất Excel">🟢 Excel</button>
+                                <button id="exportPDF" title="Xuất PDF">🔴 PDF</button>
+                            </div>
+                            <div id="digitalClock" class="digital-clock">00:00:00</div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="table-container">
+                    <table id="rosterTable">
+                        <thead>
+                            <tr>
+                                <th class="col-time">Thời Gian</th>
+                                <th class="col-shift">Kíp 1</th>
+                                <th class="col-shift">Kíp 2</th>
+                                <th class="col-shift">Kíp 3</th>
+                                <th class="col-shift">Kíp 4</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rosterBody">
+                            <!-- Rows will be generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered!', reg))
+                    .catch(err => console.log('Service Worker Failed!', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
