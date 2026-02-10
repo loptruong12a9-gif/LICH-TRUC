@@ -610,8 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ghEl = {
         panel: document.getElementById('githubPanel'),
         token: document.getElementById('ghToken'),
-        owner: document.getElementById('ghOwner'),
-        repo: document.getElementById('ghRepo'),
+        repoFull: document.getElementById('ghRepoFull'),
         path: document.getElementById('ghPath'),
         saveBtn: document.getElementById('ghSaveConfigBtn'),
         syncBtn: document.getElementById('ghSyncBtn'),
@@ -639,8 +638,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Populate UI
             if (ghEl.token) ghEl.token.value = state.githubConfig.token;
-            if (ghEl.owner) ghEl.owner.value = state.githubConfig.owner;
-            if (ghEl.repo) ghEl.repo.value = state.githubConfig.repo;
+            if (ghEl.repoFull) {
+                const full = (state.githubConfig.owner && state.githubConfig.repo)
+                    ? `${state.githubConfig.owner}/${state.githubConfig.repo}`
+                    : '';
+                ghEl.repoFull.value = full;
+            }
             if (ghEl.path) ghEl.path.value = state.githubConfig.path;
 
             updateGithubStatus('Đã nạp cấu hình', 'neutral');
@@ -648,9 +651,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveGithubConfig() {
+        const repoStr = ghEl.repoFull.value.trim();
+        const parts = repoStr.split('/');
+
+        if (parts.length !== 2 || !parts[0] || !parts[1]) {
+            alert('Vui lòng nhập đúng định dạng Repository: Owner/Repo\nVí dụ: tannguyen/lich-truc');
+            return;
+        }
+
         state.githubConfig.token = ghEl.token.value.trim();
-        state.githubConfig.owner = ghEl.owner.value.trim();
-        state.githubConfig.repo = ghEl.repo.value.trim();
+        state.githubConfig.owner = parts[0].trim();
+        state.githubConfig.repo = parts[1].trim();
         state.githubConfig.path = ghEl.path.value.trim() || 'data.json';
 
         // Persist excluding SHA (SHA is dynamic)
