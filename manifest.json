@@ -1,20 +1,25 @@
 {
-  "name": "Lịch Trực Y Cụ",
+  "name": "Lịch Trực Y Cụ - BV Hồng Đức III",
   "short_name": "Lịch Trực",
+  "description": "Ứng dụng quản lý lịch trực y cụ chuyên nghiệp cho Khoa PT-GMHS",
+  "version": "4.7.0",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#1e3a8a",
   "icons": [
     {
       "src": "logo.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     },
     {
       "src": "logo.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }
