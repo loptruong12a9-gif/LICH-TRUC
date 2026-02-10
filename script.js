@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             reader.onloadend = () => resolve(reader.result);
                             reader.readAsDataURL(blob);
                         });
-                        console.log("Default logo loaded via fetch.");
                     } else {
                         throw new Error("Fetch failed");
                     }
@@ -271,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formatter = new Intl.DateTimeFormat('vi-VN', { month: 'long', year: 'numeric' });
         const text = formatter.format(state.viewDate);
         el.currentMonthLabel.textContent = text.charAt(0).toUpperCase() + text.slice(1);
-        el.headerTitle.textContent = `LỊCH TRỰC ${text.toUpperCase()}`;
+        el.headerTitle.textContent = text.toUpperCase();
     }
 
     function renderTable() {
@@ -421,8 +420,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <style>
                 body { font-family: 'Times New Roman', serif; color: #000; }
                 table { width: 100%; border-collapse: collapse; margin-top: 5px; } /* Reduced margin */
-                th, td { border: 1px solid black; padding: 3pt; text-align: center; font-size: 11pt; } /* Reduced padding */
-                th { background-color: #f0f0f0; font-weight: bold; }
+                th { background-color: #f0f9ff; font-weight: bold; color: #0284c7; font-size: 12pt; border: 1.5pt solid #bae6fd; }
+                th, td { border: 1px solid black; padding: 5pt; text-align: center; font-size: 11pt; }
                 .col-time { text-align: left; width: 25%; }
                 
                 /* Layout Table for Header (Invisible Borders) */
@@ -438,6 +437,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 .footer { margin-top: 20px; width: 100%; page-break-inside: avoid; } /* Reduced margin */
                 .footer-table { width: 100%; border: none; margin-top: 10px; }
                 .footer-table td { border: none; text-align: center; font-size: 11pt; vertical-align: top; }
+                
+                /* Excel Save Fix: Force text format for all cells */
+                td { mso-number-format:"\@"; }
+                th { mso-number-format:"\@"; }
+
+                /* Special Days Styling */
+                .is-sunday, .is-holiday { color: #cc0000 !important; font-weight: bold; }
+                .is-sunday td, .is-holiday td { color: #cc0000 !important; }
+                .holiday-label { color: #cc0000; font-size: 0.8em; font-weight: bold; }
             </style>
         `;
 
@@ -446,13 +454,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const logoSize = 'width="140" height="140"'; // Standardized size for all
 
         if (state.logoBase64) {
-            logoImgTag = `<img src="${state.logoBase64}" ${logoSize} style="object-fit: contain;">`;
+            logoImgTag = `<img src="${state.logoBase64}" width="140" height="140" style="width:140px; height:140px; border:0; display:block;">`;
         } else {
             const logoEl = document.querySelector('.brand-logo');
             if (logoEl) {
                 const b64 = await getBase64Image(logoEl.src);
                 if (b64) {
-                    logoImgTag = `<img src="${b64}" ${logoSize} style="object-fit: contain;">`;
+                    logoImgTag = `<img src="${b64}" width="140" height="140" style="width:140px; height:140px; border:0; display:block;">`;
                 }
             }
             // Fallback
@@ -510,24 +518,151 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Wrapper for Word/Excel (Needs full HTML structure)
-        const fullDocHtml = `
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-            <head><meta charset='utf-8'><title>${title}</title></head><body>
-            ${innerContent}
-            </body></html>
-        `;
+        // Wrapper for Word/PDF (Needs full HTML structure)
+        const getFullHtml = (content, format) => {
+            const head = `
+                <head>
+                    <meta charset="utf-8">
+                    <title>${title}</title>
+                    ${format === 'word' ? `
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <w:WordDocument>
+                            <w:View>Print</w:View>
+                            <w:Zoom>100</w:Zoom>
+                            <w:DoNotOptimizeForBrowser/>
+                        </w:WordDocument>
+                    </xml>
+                    <![endif]-->
+                    ` : ''}
+                </head>
+            `;
 
-        let link, name;
+            const xmlns = format === 'word'
+                ? 'xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"'
+                : '';
+
+            return `<html ${xmlns}>${head}<body>${content}</body></html>`;
+        };
 
         if (type === 'excel') {
-            const blob = new Blob([fullDocHtml], { type: 'application/vnd.ms-excel' });
-            link = URL.createObjectURL(blob);
-            name = `Lich_Truc_${state.viewDate.getMonth() + 1}_${state.viewDate.getFullYear()}.xls`;
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Lich Truc');
+
+            // 1. Add Logo (Native Object)
+            if (state.logoBase64) {
+                try {
+                    const imageId = workbook.addImage({
+                        base64: state.logoBase64.split(',')[1],
+                        extension: 'jpeg',
+                    });
+                    worksheet.addImage(imageId, {
+                        tl: { col: 0, row: 0 },
+                        ext: { width: 100, height: 100 }
+                    });
+                } catch (e) {
+                    // Fail silently in production
+                }
+            }
+
+            // 2. Header Text
+            worksheet.mergeCells('B1:E1');
+            worksheet.getCell('B1').value = 'BỆNH VIỆN ĐK HỒNG ĐỨC III';
+            worksheet.getCell('B1').font = { name: 'Times New Roman', size: 16, bold: true, color: { argb: 'FF004D99' } };
+            worksheet.getCell('B1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+            worksheet.mergeCells('B2:E2');
+            worksheet.getCell('B2').value = 'KHOA PT-GMHS';
+            worksheet.getCell('B2').font = { name: 'Times New Roman', size: 15, bold: true, color: { argb: 'FFCC0000' } };
+            worksheet.getCell('B2').alignment = { vertical: 'middle', horizontal: 'center' };
+
+            worksheet.mergeCells('B3:E3');
+            worksheet.getCell('B3').value = 'LỊCH TRỰC Y CỤ';
+            worksheet.getCell('B3').font = { name: 'Times New Roman', size: 14, italic: true };
+            worksheet.getCell('B3').alignment = { vertical: 'middle', horizontal: 'center' };
+
+            worksheet.mergeCells('A5:E5');
+            worksheet.getCell('A5').value = title.toUpperCase();
+            worksheet.getCell('A5').font = { name: 'Times New Roman', size: 20, bold: true };
+            worksheet.getCell('A5').alignment = { vertical: 'middle', horizontal: 'center' };
+
+            // 3. Build Table Headers
+            const headers = ['Thời Gian', 'Kíp 1', 'Kíp 2', 'Kíp 3', 'Kíp 4'];
+            const headerRow = worksheet.getRow(7);
+            headerRow.values = headers;
+            headerRow.font = { name: 'Times New Roman', size: 11, bold: true, color: { argb: 'FF0000FF' } };
+            headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+            headerRow.eachCell((cell) => {
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F9FF' } }; // Lightest Sky Blue
+                cell.font = { name: 'Times New Roman', size: 12, bold: true, color: { argb: 'FF0284C7' } }; // Vibrant Blue
+            });
+
+            // 4. Populate Data
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach((tr, index) => {
+                const excelRow = worksheet.getRow(8 + index);
+                const cells = tr.querySelectorAll('td');
+                const values = Array.from(cells).map(td => td.textContent.trim());
+                const isSpecial = tr.classList.contains('is-sunday') || tr.classList.contains('is-holiday');
+                excelRow.values = values;
+                excelRow.font = {
+                    name: 'Times New Roman',
+                    size: 11,
+                    bold: isSpecial,
+                    color: isSpecial ? { argb: 'FFFF0000' } : { argb: 'FF000000' }
+                };
+                excelRow.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                excelRow.eachCell((cell, colNumber) => {
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    // Time column left-aligned
+                    if (colNumber === 1) cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+                });
+            });
+
+            // 5. Footer Content
+            const lastDataRow = 8 + rows.length;
+            worksheet.mergeCells(`A${lastDataRow + 2}:B${lastDataRow + 2} `);
+            worksheet.getCell(`A${lastDataRow + 2} `).value = 'NGƯỜI LẬP BẢNG';
+            worksheet.getCell(`A${lastDataRow + 2} `).font = { name: 'Times New Roman', bold: true };
+            worksheet.getCell(`A${lastDataRow + 2} `).alignment = { horizontal: 'center' };
+
+            worksheet.mergeCells(`D${lastDataRow + 2}:E${lastDataRow + 2} `);
+            worksheet.getCell(`D${lastDataRow + 2} `).value = 'TRƯỞNG KHOA DUYỆT';
+            worksheet.getCell(`D${lastDataRow + 2} `).font = { name: 'Times New Roman', bold: true };
+            worksheet.getCell(`D${lastDataRow + 2} `).alignment = { horizontal: 'center' };
+
+            worksheet.mergeCells(`A${lastDataRow + 8}:B${lastDataRow + 8} `);
+            worksheet.getCell(`A${lastDataRow + 8} `).value = 'NGUYỄN VĂN TÂN';
+            worksheet.getCell(`A${lastDataRow + 8} `).font = { name: 'Times New Roman', bold: true };
+            worksheet.getCell(`A${lastDataRow + 8} `).alignment = { horizontal: 'center' };
+
+            worksheet.mergeCells(`D${lastDataRow + 8}:E${lastDataRow + 8} `);
+            worksheet.getCell(`D${lastDataRow + 8} `).value = '.........................................';
+            worksheet.getCell(`D${lastDataRow + 8} `).alignment = { horizontal: 'center' };
+
+            worksheet.mergeCells(`A${lastDataRow + 10}:E${lastDataRow + 10} `);
+            worksheet.getCell(`A${lastDataRow + 10} `).value = `Ngày xuất: ${new Date().toLocaleDateString('vi-VN')} `;
+            worksheet.getCell(`A${lastDataRow + 10} `).font = { name: 'Times New Roman', italic: true, size: 10, color: { argb: 'FF666666' } };
+            worksheet.getCell(`A${lastDataRow + 10} `).alignment = { horizontal: 'right' };
+
+            // 6. Column Widths
+            worksheet.getColumn(1).width = 30; // Time column
+            worksheet.getColumn(2).width = 20;
+            worksheet.getColumn(3).width = 20;
+            worksheet.getColumn(4).width = 20;
+            worksheet.getColumn(5).width = 20;
+
+            // 7. Write & Download
+            const buffer = await workbook.xlsx.writeBuffer();
+            const fileName = `LỊCH TRỰC T${state.viewDate.getMonth() + 1}_${state.viewDate.getFullYear()}.xlsx`;
+            saveAs(new Blob([buffer]), fileName);
+            return; // Exit as we used FileSaver
         } else if (type === 'word') {
-            const blob = new Blob([fullDocHtml], { type: 'application/msword' });
+            const html = getFullHtml(innerContent, 'word');
+            const blob = new Blob([html], { type: 'application/msword' });
             link = URL.createObjectURL(blob);
-            name = `Lich_Truc_${state.viewDate.getMonth() + 1}_${state.viewDate.getFullYear()}.doc`;
+            name = `LỊCH TRỰC T${state.viewDate.getMonth() + 1}_${state.viewDate.getFullYear()}.doc`;
         } else if (type === 'pdf') {
             // PDF Logic: Use Native Browser Print (iframe) to ensure 100% WYSIWYG
             // This fixes the "Blank PDF" issue by using the browser's own rendering engine
@@ -545,8 +680,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Get valid document
             const doc = iframe.contentWindow.document;
+            const fullPdfHtml = getFullHtml(innerContent, 'pdf');
             doc.open();
-            doc.write(fullDocHtml);
+            doc.write(fullPdfHtml);
             doc.close();
 
             // Wait for images (Logo) to load inside iframe then Print
@@ -583,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const s = String(now.getSeconds()).padStart(2, '0');
             const clockEl = document.getElementById('digitalClock');
             if (clockEl) {
-                clockEl.textContent = `${h}:${m}:${s}`;
+                clockEl.textContent = `${h}:${m}:${s} `;
             }
         };
         update(); // Initial call
@@ -617,7 +753,21 @@ document.addEventListener('DOMContentLoaded', () => {
         status: document.getElementById('ghStatus')
     };
 
-    // Toggle Logic
+    // Toggle Logic (Staff List)
+    const staffToggleHeader = document.getElementById('staffToggleHeader');
+    const staffConfigContent = document.getElementById('staffConfigContent');
+    const staffChevron = document.getElementById('staffChevron');
+    if (staffToggleHeader && staffConfigContent) {
+        staffToggleHeader.addEventListener('click', () => {
+            const isHidden = staffConfigContent.style.display === 'none';
+            staffConfigContent.style.display = isHidden ? 'block' : 'none';
+            if (staffChevron) {
+                staffChevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+        });
+    }
+
+    // GitHub Toggle Logic
     if (ghEl.header && ghEl.content) {
         ghEl.header.addEventListener('click', () => {
             const isHidden = ghEl.content.style.display === 'none';

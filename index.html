@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3a8a">
     <title>Lịch Trực Y Cụ - BV Hồng Đức III</title>
 
     <!-- PWA & Mobile Support -->
@@ -19,6 +22,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- HTML2PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- ExcelJS & FileSaver (For True .xlsx Binary Export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 
 <body>
@@ -82,40 +88,54 @@
                     <p class="hint">Chọn ngày bắt đầu (Thứ 2 đầu tiên) của chu kỳ.</p>
                 </div>
 
-                <div class="control-group">
-                    <label for="staffInput">Danh Sách Nhân Viên</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-height: 150px;">
-                        <!-- Column 1: Quick Suggestions -->
-                        <div id="quickSelectPanel"
-                            style="background: #f8fafc; padding: 0.5rem; border-radius: 6px; border: 1px dashed #cbd5e1; overflow-y: auto;">
-                            <p
-                                style="font-size: 0.7rem; color: #64748b; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px;">
-                                ✨ Gợi ý nhanh:
-                            </p>
-                            <div id="quickStaffContainer"
-                                style="display: flex; flex-wrap: wrap; gap: 12px 8px; margin-bottom: 10px; padding: 10px 5px 5px 5px;">
-                                <!-- Chips will be injected by JS -->
-                            </div>
+                <div class="control-group" id="staffPanel"
+                    style="padding: 0.5rem; background: #f0fdf4; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #bbf7d0;">
 
-                            <!-- Input to add more -->
-                            <div style="display: flex; gap: 4px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
-                                <input type="text" id="newSuggestInput" placeholder="Thêm tên..."
-                                    style="flex: 1; padding: 4px; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 4px;">
-                                <button id="addSuggestBtn"
-                                    style="padding: 2px 8px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">+</button>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; flex-direction: column;">
-                            <textarea id="staffInput" style="flex: 1; min-height: 120px;"
-                                placeholder="Tên sẽ hiện ở đây khi bạn bấm gợi ý..."></textarea>
-                        </div>
+                    <div id="staffToggleHeader"
+                        style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                        <label
+                            style="font-weight:bold; font-size:0.8rem; color:#15803d; cursor:pointer; margin-bottom:0;">👤
+                            Danh Sách Nhân Viên</label>
+                        <span id="staffChevron"
+                            style="font-size:0.7rem; color:#15803d; transition: transform 0.3s;">▼</span>
                     </div>
 
-                    <!-- Save Button (Visible by default) -->
-                    <button id="saveStaffBtn" class="primary-btn" style="margin-top: 10px;">Lưu & Tạo Lịch</button>
+                    <div id="staffConfigContent" style="display:none; margin-top:10px;">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; min-height: 150px; width: 100%;">
+                            <!-- Column 1: Quick Suggestions -->
+                            <div id="quickSelectPanel" class="mobile-no-scroll"
+                                style="background: #f8fafc; padding: 0.5rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
+                                <p
+                                    style="font-size: 0.7rem; color: #64748b; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px;">
+                                    ✨ Gợi ý nhanh:
+                                </p>
+                                <div id="quickStaffContainer"
+                                    style="display: flex; flex-wrap: wrap; gap: 12px 8px; margin-bottom: 10px; padding: 10px 5px 5px 5px;">
+                                    <!-- Chips will be injected by JS -->
+                                </div>
 
-                    <p class="hint">*Nhập đúng thứ tự cặp để thuật toán chạy đúng. Bấm tên bên trái để chọn nhanh.</p>
+                                <!-- Input to add more -->
+                                <div style="display: flex; gap: 4px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
+                                    <input type="text" id="newSuggestInput" placeholder="Thêm tên..."
+                                        style="flex: 1; padding: 4px; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                                    <button id="addSuggestBtn"
+                                        style="padding: 2px 8px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">+</button>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column;">
+                                <textarea id="staffInput" style="flex: 1; min-height: 120px;"
+                                    placeholder="Tên sẽ hiện ở đây khi bạn bấm gợi ý..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <button id="saveStaffBtn" class="primary-btn" style="margin-top: 10px; width: 100%;">Lưu & Tạo
+                            Lịch</button>
+                        <p class="hint" style="margin-top: 5px;">*Nhập đúng thứ tự cặp để thuật toán chạy đúng. Bấm tên
+                            bên trái để chọn nhanh.</p>
+                    </div>
                 </div>
 
                 <div class="control-group">
@@ -137,7 +157,7 @@
                             <div class="dev-name">Tân Nguyễn</div>
                             <div class="dev-contact">036.728.7102</div>
                             <div class="dev-quote">"Code một lần - Dùng một đời"</div>
-                            <div class="app-version-badge">Version 3.35 - 10.02.2026</div>
+                            <div class="app-version-badge">Version 4.7.0 Stable - 10.02.2026</div>
 
                         </div>
                     </div>
@@ -152,7 +172,7 @@
                 <header class="top-bar">
                     <div class="header-left">
                         <h2 id="headerTitle">Tháng ...</h2>
-                        <div class="greeting-text">CHÚC BẠN NGÀY MỚI AN LÀNH VÀ HẠNH PHÚC</div>
+                        <div class="rgb-text">HAVE A NICE DAY! 🌟</div>
                         <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 2px; font-style: italic;">Phát triển
                             bởi Tân Nguyễn</div>
                     </div>
@@ -161,9 +181,15 @@
 
                         <div class="legend">
                             <div class="export-controls">
-                                <button id="exportWord" title="Xuất Word">🔵 Word</button>
-                                <button id="exportExcel" title="Xuất Excel">🟢 Excel</button>
-                                <button id="exportPDF" title="Xuất PDF">🔴 PDF</button>
+                                <button id="exportWord" class="btn-vip btn-word" title="Xuất Word">
+                                    <i class="fa-solid fa-file-word"></i> <span>Word</span>
+                                </button>
+                                <button id="exportExcel" class="btn-vip btn-excel" title="Xuất Excel">
+                                    <i class="fa-solid fa-file-excel"></i> <span>Excel</span>
+                                </button>
+                                <button id="exportPDF" class="btn-vip btn-pdf" title="Xuất PDF">
+                                    <i class="fa-solid fa-file-pdf"></i> <span>PDF</span>
+                                </button>
                             </div>
                             <div id="digitalClock" class="digital-clock">00:00:00</div>
                         </div>

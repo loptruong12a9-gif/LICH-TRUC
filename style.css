@@ -33,15 +33,28 @@ body {
     /* Fallback for browsers that don't support dvh */
     height: 100dvh;
     /* Dynamic Viewport Height for mobile browsers */
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     font-size: 13px;
     /* Reduced from 14px */
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+}
+
+html {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
 }
 
 /* Layout Framework */
 .app-container {
     display: flex;
     height: 100%;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 /* --- SIDEBAR --- */
@@ -55,7 +68,7 @@ body {
     z-index: 20;
     box-shadow: var(--shadow-sm);
     padding-bottom: env(safe-area-inset-bottom);
-    /* Protect bottom content */
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .brand {
@@ -85,6 +98,29 @@ body {
     background-color: white;
 }
 
+/* --- RGB TEXT ANIMATION --- */
+.rgb-text {
+    font-weight: bold;
+    text-transform: uppercase;
+    background: linear-gradient(to right,
+            #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rgb-sweep 3s linear infinite;
+    display: inline-block;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+@keyframes rgb-sweep {
+    to {
+        background-position: 200% center;
+    }
+}
+
 .brand-text {
     display: flex;
     flex-direction: column;
@@ -102,6 +138,7 @@ body {
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
+    transition: color 0.3s ease;
 }
 
 .app-name {
@@ -683,6 +720,10 @@ tr.is-holiday {
     /* White hard shadow to make it pop against blue */
     animation: rainbowMove 5s linear infinite;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    /* Constrain on narrow screens */
 }
 
 @keyframes rainbowMove {
@@ -699,6 +740,71 @@ tr.is-holiday {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+}
+
+/* legend and export controls */
+.legend {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.export-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-vip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.btn-vip :is(i, span) {
+    pointer-events: none;
+}
+
+.btn-vip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.btn-vip:active {
+    transform: translateY(0);
+}
+
+.btn-word {
+    background: linear-gradient(135deg, #2b579a, #1b3d6d);
+}
+
+.btn-excel {
+    background: linear-gradient(135deg, #217346, #164c2e);
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #d32f2f, #b71c1c);
+}
+
+@media (max-width: 768px) {
+    .btn-vip span {
+        display: none;
+    }
+
+    .btn-vip {
+        padding: 6px 8px;
+        border-radius: 6px;
+    }
 }
 
 /* Weather Widget */
@@ -813,14 +919,24 @@ tr.is-holiday {
         display: none;
         padding-top: 0;
         background: #f8fafc;
-        max-height: 50vh;
-        /* Limit height */
+        max-height: 85vh;
+        /* Increased from 50vh */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 40px;
+        /* Safe space at bottom */
         box-shadow: inset 0 -4px 4px -4px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-content.active {
         display: flex;
-        /* Show when active */
+        flex-direction: column;
+    }
+
+    /* Disable nested scrolls on mobile to avoid scroll-trapping */
+    .mobile-no-scroll {
+        overflow-y: visible !important;
+        max-height: none !important;
     }
 
     /* Add a visible Toggle Button in CSS (controlled by JS) */
