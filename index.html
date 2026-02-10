@@ -162,8 +162,31 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker Registered!', reg))
-                    .catch(err => console.log('Service Worker Failed!', err));
+                    .then(reg => {
+                        console.log('Service Worker Registered!', reg);
+
+                        // Aggressive check for updates (every 2 mins)
+                        setInterval(() => {
+                            reg.update().catch(() => { });
+                        }, 1000 * 120);
+
+                        // Check for updates every time the user comes back to the app
+                        document.addEventListener('visibilitychange', () => {
+                            if (document.visibilityState === 'visible') {
+                                reg.update().catch(() => { });
+                            }
+                        });
+                    })
+                    .catch(err => console.error('Service Worker Failed!', err));
+            });
+
+            // Reload the page when a new Service Worker takes control
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
             });
         }
     </script>
