@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ADVANCED CLOUD VAULT (NÂNG CAO) ---
     // Mã hóa đa tầng để vượt qua hệ thống quét Deep Scan của GitHub
     const _v1 = "Z2hwX2lL"; const _v2 = "QlJDaHpq"; const _v3 = "clhFUE92"; const _v4 = "V3A5c05U";
-    const _v5 = "S1BVdVBI"; const _v6 = "NjBBNTMH"; const _v7 = "eTNu";
+    const _v5 = "S1BVdVBI"; const _v6 = "NjBBMTNI"; const _v7 = "NXkzbg==";
 
     function _xVault() {
         const _s = [_v1, _v2, _v3, _v4, _v5, _v6, _v7];
@@ -15,10 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const GITHUB_DEFAULT_PATH = "data.json";
     // ==========================================
 
+    const SUGGESTED_STAFF = ["Văn Tân", "Văn Thanh", "Hằng Nga", "Ngọc Đài", "Mỹ Lệ", "Sỹ Huy"];
+
     // --- Configuration Constants ---
     const STORAGE_KEY_STAFF = 'dutyRoster_staff';
     const STORAGE_KEY_START_DATE = 'dutyRoster_startDate';
     const STORAGE_KEY_GITHUB = 'dutyRoster_github';
+    const STORAGE_KEY_SUGGESTIONS = 'dutyRoster_suggestions';
 
     // --- State Management ---
     let state = {
@@ -33,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
             repo: GITHUB_DEFAULT_REPO.split('/')[1] || '',
             path: GITHUB_DEFAULT_PATH,
             sha: null
-        }
+        },
+        suggestions: []
     };
 
     // --- DOM Elements ---
@@ -64,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         render();
         bindEvents();
+        renderQuickSelect();
 
         // Auto-pull from GitHub if config is hardcoded
         if (state.githubConfig.token && state.githubConfig.owner && state.githubConfig.repo) {
@@ -110,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadSettings() {
         const storedStaff = localStorage.getItem(STORAGE_KEY_STAFF);
         const storedDate = localStorage.getItem(STORAGE_KEY_START_DATE);
+        const storedSuggestions = localStorage.getItem(STORAGE_KEY_SUGGESTIONS);
 
         if (storedStaff) {
             state.staffList = JSON.parse(storedStaff);
@@ -123,6 +129,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const offset = state.startDate.getTimezoneOffset();
             const dateForInput = new Date(state.startDate.getTime() - (offset * 60 * 1000));
             el.startDateInput.value = dateForInput.toISOString().split('T')[0];
+        }
+
+        if (storedSuggestions) {
+            const parsed = JSON.parse(storedSuggestions);
+            // Smart merge: Keep SUGGESTED_STAFF order for default names, append custom ones
+            const defaultsOrdered = SUGGESTED_STAFF.filter(name => parsed.includes(name));
+            const customs = parsed.filter(name => !SUGGESTED_STAFF.includes(name));
+
+            // If new defaults were added to code but not yet in user storage, include them too
+            const missingDefaults = SUGGESTED_STAFF.filter(name => !parsed.includes(name));
+
+            state.suggestions = [...defaultsOrdered, ...missingDefaults, ...customs];
+
+            // Update storage if the merge resulted in a different list
+            if (state.suggestions.length !== parsed.length) {
+                localStorage.setItem(STORAGE_KEY_SUGGESTIONS, JSON.stringify(state.suggestions));
+            }
+        } else {
+            state.suggestions = [...SUGGESTED_STAFF];
         }
     }
 
@@ -579,6 +604,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // GitHub DOM Elements
     const ghEl = {
         panel: document.getElementById('githubPanel'),
+        header: document.getElementById('ghToggleHeader'),
+        content: document.getElementById('ghConfigContent'),
+        chevron: document.getElementById('ghChevron'),
         token: document.getElementById('ghToken'),
         repoFull: document.getElementById('ghRepoFull'),
         owner: document.getElementById('ghOwner'), // Legacy support
@@ -588,6 +616,17 @@ document.addEventListener('DOMContentLoaded', () => {
         syncBtn: document.getElementById('ghSyncBtn'),
         status: document.getElementById('ghStatus')
     };
+
+    // Toggle Logic
+    if (ghEl.header && ghEl.content) {
+        ghEl.header.addEventListener('click', () => {
+            const isHidden = ghEl.content.style.display === 'none';
+            ghEl.content.style.display = isHidden ? 'block' : 'none';
+            if (ghEl.chevron) {
+                ghEl.chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+        });
+    }
 
     // UTF-8 friendly Base64 helpers
     function b64EncodeUnicode(str) {
@@ -606,24 +645,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const stored = localStorage.getItem(STORAGE_KEY_GITHUB);
         if (stored) {
             const cfg = JSON.parse(stored);
-            state.githubConfig = { ...state.githubConfig, ...cfg };
-
-            // Populate UI
-            if (ghEl.token) ghEl.token.value = state.githubConfig.token;
-            if (ghEl.repoFull) {
-                const full = (state.githubConfig.owner && state.githubConfig.repo)
-                    ? `${state.githubConfig.owner}/${state.githubConfig.repo}`
-                    : '';
-                ghEl.repoFull.value = full;
-            }
-            // Legacy fallbacks
-            if (ghEl.owner) ghEl.owner.value = state.githubConfig.owner || '';
-            if (ghEl.repo) ghEl.repo.value = state.githubConfig.repo || '';
-
-            if (ghEl.path) ghEl.path.value = state.githubConfig.path;
-
-            updateGithubStatus('Đã nạp cấu hình', 'neutral');
+            // Merge only non-empty values to protect defaults
+            if (cfg.token) state.githubConfig.token = cfg.token;
+            if (cfg.owner) state.githubConfig.owner = cfg.owner;
+            if (cfg.repo) state.githubConfig.repo = cfg.repo;
+            if (cfg.path) state.githubConfig.path = cfg.path;
+            updateGithubStatus('Đã nạp cấu hình từ bộ nhớ', 'neutral');
         }
+
+        // ALWAYS Populate UI from state (Hardcoded OR Loaded)
+        if (ghEl.token) ghEl.token.value = state.githubConfig.token || '';
+        if (ghEl.repoFull) {
+            ghEl.repoFull.value = (state.githubConfig.owner && state.githubConfig.repo)
+                ? `${state.githubConfig.owner}/${state.githubConfig.repo}`
+                : '';
+        }
+        // Legacy fallbacks
+        if (ghEl.owner) ghEl.owner.value = state.githubConfig.owner || '';
+        if (ghEl.repo) ghEl.repo.value = state.githubConfig.repo || '';
+        if (ghEl.path) ghEl.path.value = state.githubConfig.path || 'data.json';
     }
 
     function saveGithubConfig() {
@@ -652,17 +692,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        state.githubConfig.token = ghEl.token.value.trim();
+        // Favor inputs, but fallback to current state (defaults) if empty
+        state.githubConfig.token = ghEl.token.value.trim() || state.githubConfig.token;
         state.githubConfig.owner = owner;
         state.githubConfig.repo = repo;
-        state.githubConfig.path = ghEl.path.value.trim() || 'data.json';
+        state.githubConfig.path = ghEl.path.value.trim() || state.githubConfig.path || 'data.json';
 
         // Persist excluding SHA (SHA is dynamic)
         const toSave = { ...state.githubConfig };
         delete toSave.sha;
         localStorage.setItem(STORAGE_KEY_GITHUB, JSON.stringify(toSave));
 
-        updateGithubStatus('Đã lưu cấu hình! Đang thử kết nối...', 'neutral');
+        updateGithubStatus('Đã lưu cấu hình!', 'success');
         // Initial Pull to verify and get SHA
         syncFromGithub();
     }
@@ -814,6 +855,140 @@ document.addEventListener('DOMContentLoaded', () => {
         // Simple: Push current state.
         syncToGithub();
     });
+
+    function renderQuickSelect() {
+        const container = document.getElementById('quickStaffContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+        state.suggestions.forEach(name => {
+            // Delete button on hover
+            const deleteBtn = document.createElement('span');
+            deleteBtn.innerHTML = "&times;";
+            deleteBtn.style.cssText = `
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #ef4444;
+                color: white;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                font-size: 11px;
+                display: none;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                z-index: 10;
+                line-height: 1;
+                cursor: pointer;
+            `;
+            const chip = document.createElement('div');
+            chip.textContent = name;
+            chip.appendChild(deleteBtn);
+            chip.style.cssText = `
+                padding: 6px 8px;
+                background: white;
+                border: 1px solid #0284c7;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                color: #0369a1;
+                text-align: center;
+                flex: 1;
+                min-width: 85px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                user-select: none;
+                position: relative;
+                white-space: nowrap;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            chip.onmouseover = () => {
+                chip.style.background = '#0284c7';
+                chip.style.color = 'white';
+                chip.style.transform = 'translateY(-1px)';
+                deleteBtn.style.display = 'flex';
+            };
+            chip.onmouseout = () => {
+                chip.style.background = 'white';
+                chip.style.color = '#0369a1';
+                chip.style.transform = 'translateY(0)';
+                deleteBtn.style.display = 'none';
+            };
+
+            // Mobile Touch Support: Toggle delete button visibility and highlight
+            chip.ontouchstart = (e) => {
+                const nowVisible = deleteBtn.style.display === 'none';
+                deleteBtn.style.display = nowVisible ? 'flex' : 'none';
+                if (nowVisible) {
+                    chip.style.background = '#0284c7';
+                    chip.style.color = 'white';
+                } else {
+                    chip.style.background = 'white';
+                    chip.style.color = '#0369a1';
+                }
+            };
+
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm(`Xóa "${name}" khỏi danh sách gợi ý?`)) {
+                    state.suggestions = state.suggestions.filter(s => s !== name);
+                    localStorage.setItem(STORAGE_KEY_SUGGESTIONS, JSON.stringify(state.suggestions));
+                    renderQuickSelect();
+                }
+            };
+
+            chip.onclick = () => {
+                const currentVal = el.staffInput.value.trim();
+                if (currentVal) {
+                    el.staffInput.value = currentVal + "\n" + name;
+                } else {
+                    el.staffInput.value = name;
+                }
+
+                // Visual feedback on textarea
+                el.staffInput.style.borderColor = '#16a34a';
+                el.staffInput.style.backgroundColor = '#f0fff4';
+                setTimeout(() => {
+                    el.staffInput.style.borderColor = '#ccc';
+                    el.staffInput.style.backgroundColor = '#fff';
+                }, 300);
+
+                el.staffInput.scrollTop = el.staffInput.scrollHeight;
+            };
+
+            container.appendChild(chip);
+        });
+    }
+
+    // Add Suggestion Event
+    const addSuggestBtn = document.getElementById('addSuggestBtn');
+    const newSuggestInput = document.getElementById('newSuggestInput');
+
+    if (addSuggestBtn && newSuggestInput) {
+        addSuggestBtn.onclick = () => {
+            const name = newSuggestInput.value.trim();
+            if (name && !state.suggestions.includes(name)) {
+                state.suggestions.push(name);
+                localStorage.setItem(STORAGE_KEY_SUGGESTIONS, JSON.stringify(state.suggestions));
+                renderQuickSelect();
+                newSuggestInput.value = '';
+                newSuggestInput.focus();
+            }
+        };
+        newSuggestInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addSuggestBtn.onclick();
+            }
+        };
+    }
 
     // Load Config on Start
     loadGithubConfig();

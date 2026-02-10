@@ -37,30 +37,39 @@
             <!-- Sidebar Content (Always Visible for Viewing) -->
             <div class="sidebar-content" id="sidebarMain">
 
-                <!-- GitHub Cloud Config (Always Visible now) -->
+                <!-- GitHub Cloud Config (Collapsible) -->
                 <div id="githubPanel"
-                    style="display:block; padding: 0.5rem; background: #e0f2fe; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #7dd3fc;">
-                    <label
-                        style="font-weight:bold; font-size:0.8rem; color:#0369a1; display:block; margin-bottom:5px;">☁️
-                        Đồng bộ GitHub (Cloud)</label>
+                    style="padding: 0.5rem; background: #e0f2fe; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #7dd3fc;">
 
-                    <input type="password" id="ghToken" placeholder="GitHub Token (PAT)..."
-                        style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
-
-                    <input type="text" id="ghRepoFull" placeholder="Nhập User/Repo (VD: loptruong12a9-gif/LICH-TRUC)"
-                        style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
-
-                    <input type="text" id="ghPath" value="data.json" placeholder="Tên file lưu trữ (VD: data.json)"
-                        style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
-
-                    <div style="display:flex; gap:5px;">
-                        <button id="ghSaveConfigBtn"
-                            style="flex:1; padding:4px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.8rem;">Lưu
-                            Cấu Hình</button>
-                        <button id="ghSyncBtn"
-                            style="flex:1; padding:4px; background:#16a34a; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.8rem;">Đồng
-                            bộ Ngay</button>
+                    <div id="ghToggleHeader"
+                        style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                        <label style="font-weight:bold; font-size:0.8rem; color:#0369a1; cursor:pointer;">☁️ Đồng bộ
+                            GitHub (Cloud)</label>
+                        <span id="ghChevron"
+                            style="font-size:0.7rem; color:#0369a1; transition: transform 0.3s;">▼</span>
                     </div>
+
+                    <div id="ghConfigContent" style="display:none; margin-top:10px;">
+                        <input type="password" id="ghToken" placeholder="GitHub Token (PAT)..."
+                            style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
+
+                        <input type="text" id="ghRepoFull"
+                            placeholder="Nhập User/Repo (VD: loptruong12a9-gif/LICH-TRUC)"
+                            style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
+
+                        <input type="text" id="ghPath" value="data.json" placeholder="Tên file lưu trữ (VD: data.json)"
+                            style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
+
+                        <div style="display:flex; gap:5px;">
+                            <button id="ghSaveConfigBtn"
+                                style="flex:1; padding:4px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.8rem;">Lưu
+                                Cấu Hình</button>
+                            <button id="ghSyncBtn"
+                                style="flex:1; padding:4px; background:#16a34a; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.8rem;">Đồng
+                                bộ Ngay</button>
+                        </div>
+                    </div>
+
                     <div id="ghStatus" style="font-size:0.7rem; color:#64748b; margin-top:5px; font-style:italic;">Chưa
                         cấu hình</div>
                 </div>
@@ -75,13 +84,38 @@
 
                 <div class="control-group">
                     <label for="staffInput">Danh Sách Nhân Viên</label>
-                    <textarea id="staffInput"
-                        placeholder="Nhập tên nhân viên theo cặp...&#10;Ví dụ:&#10;TÂN&#10;LỆ&#10;ĐÔNG&#10;ĐÀI..."></textarea>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-height: 150px;">
+                        <!-- Column 1: Quick Suggestions -->
+                        <div id="quickSelectPanel"
+                            style="background: #f8fafc; padding: 0.5rem; border-radius: 6px; border: 1px dashed #cbd5e1; overflow-y: auto;">
+                            <p
+                                style="font-size: 0.7rem; color: #64748b; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px;">
+                                ✨ Gợi ý nhanh:
+                            </p>
+                            <div id="quickStaffContainer"
+                                style="display: flex; flex-wrap: wrap; gap: 12px 8px; margin-bottom: 10px; padding: 10px 5px 5px 5px;">
+                                <!-- Chips will be injected by JS -->
+                            </div>
+
+                            <!-- Input to add more -->
+                            <div style="display: flex; gap: 4px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
+                                <input type="text" id="newSuggestInput" placeholder="Thêm tên..."
+                                    style="flex: 1; padding: 4px; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                                <button id="addSuggestBtn"
+                                    style="padding: 2px 8px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">+</button>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column;">
+                            <textarea id="staffInput" style="flex: 1; min-height: 120px;"
+                                placeholder="Tên sẽ hiện ở đây khi bạn bấm gợi ý..."></textarea>
+                        </div>
+                    </div>
 
                     <!-- Save Button (Visible by default) -->
-                    <button id="saveStaffBtn" class="primary-btn">Lưu & Tạo Lịch</button>
+                    <button id="saveStaffBtn" class="primary-btn" style="margin-top: 10px;">Lưu & Tạo Lịch</button>
 
-                    <p class="hint">*Nhập đúng thứ tự cặp để thuật toán chạy đúng.</p>
+                    <p class="hint">*Nhập đúng thứ tự cặp để thuật toán chạy đúng. Bấm tên bên trái để chọn nhanh.</p>
                 </div>
 
                 <div class="control-group">
@@ -103,7 +137,7 @@
                             <div class="dev-name">Tân Nguyễn</div>
                             <div class="dev-contact">036.728.7102</div>
                             <div class="dev-quote">"Code một lần - Dùng một đời"</div>
-                            <div class="app-version-badge">Version 3.30 GOLDEN - 10.02.2026</div>
+                            <div class="app-version-badge">Version 3.35 - 10.02.2026</div>
 
                         </div>
                     </div>
