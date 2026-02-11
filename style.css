@@ -1351,33 +1351,46 @@ tr.is-holiday {
     }
 
     .brand {
-        flex-direction: row;
-        /* Horizontal logo/text */
+        flex-direction: column;
+        /* Stack vertically */
         padding: 0.5rem 1rem;
         padding-top: calc(0.5rem + env(safe-area-inset-top));
         padding-left: calc(1rem + env(safe-area-inset-left));
         padding-right: calc(1rem + env(safe-area-inset-right));
-        justify-content: space-between;
-        /* Space for toggle button */
-        text-align: left;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        /* For absolute toggle */
         cursor: pointer;
         /* Clickable */
         user-select: none;
+        padding-bottom: 1rem;
     }
 
     .brand-logo {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
+        margin-bottom: 0.5rem;
     }
 
     .brand-text h1.hospital-name {
-        display: none;
+        display: block;
+        font-size: 0.85rem;
+        margin-bottom: 2px;
+    }
+
+    .brand-text h2.department-name {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+        display: block;
     }
 
     /* Hide extra details to save space */
     .brand-text .app-name {
-        font-size: 1rem;
-        margin: 0;
+        font-size: 1.1rem;
+        margin: 4px 0;
+        display: block;
     }
 
     /* Fix iOS Zoom on Focus: Inputs must be at least 16px */
@@ -1420,9 +1433,13 @@ tr.is-holiday {
         /* FontAwesome Bars */
         font-family: 'Font Awesome 6 Free';
         font-weight: 900;
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         cursor: pointer;
         display: block;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #854d0e;
     }
 
     .main-content {
