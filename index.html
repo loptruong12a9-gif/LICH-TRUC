@@ -31,123 +31,163 @@
     <div class="app-container">
         <!-- Sidebar for Settings -->
         <aside class="sidebar">
+            <!-- Royal Imperial Brand Hub -->
             <div class="brand">
-                <img src="logo.jpg" alt="Logo" class="brand-logo" id="brandLogoImg">
+                <img src="logo.jpg" alt="Logo" class="brand-logo">
                 <div class="brand-text">
-                    <div class="hospital-name">BỆNH VIỆN ĐK HỒNG ĐỨC III</div>
-                    <div class="dept-name">KHOA PT-GMHS</div>
+                    <h1 class="hospital-name">Bệnh Viện ĐK Hồng Đức III</h1>
+                    <h2 class="department-name">Khoa PT-GMHS</h2>
                     <div class="app-name">LỊCH TRỰC Y CỤ</div>
+                    <span class="version-badge">v5.0.1 ULTIMATE</span>
                 </div>
             </div>
-
             <!-- Sidebar Content (Always Visible for Viewing) -->
             <div class="sidebar-content" id="sidebarMain">
 
-                <!-- GitHub Cloud Config (Collapsible) -->
-                <div id="githubPanel"
-                    style="padding: 0.5rem; background: #e0f2fe; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #7dd3fc;">
-
+                <!-- Royal Cloud Panel -->
+                <div id="githubPanel" class="royal-cloud-panel">
                     <div id="ghToggleHeader"
                         style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                        <label style="font-weight:bold; font-size:0.8rem; color:#0369a1; cursor:pointer;">☁️ Đồng bộ
-                            GitHub (Cloud)</label>
+                        <label class="cloud-title-royal" style="cursor:pointer;">☁️ ĐỒNG BỘ GITHUB (CLOUD)</label>
                         <span id="ghChevron"
-                            style="font-size:0.7rem; color:#0369a1; transition: transform 0.3s;">▼</span>
+                            style="font-size:0.75rem; color:#bf953f; transition: transform 0.3s;">▼</span>
                     </div>
 
                     <div id="ghConfigContent" style="display:none; margin-top:10px;">
-                        <input type="password" id="ghToken" placeholder="GitHub Token (PAT)..."
-                            style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
+                        <input type="password" id="ghToken" placeholder="GitHub Token..."
+                            style="width:100%; margin-bottom:5px; padding:6px; border:1px solid #bf953f; border-radius:4px; font-size:0.8rem;">
 
-                        <input type="text" id="ghRepoFull"
-                            placeholder="Nhập User/Repo (VD: loptruong12a9-gif/LICH-TRUC)"
-                            style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
+                        <input type="text" id="ghRepoFull" placeholder="User/Repo..."
+                            style="width:100%; margin-bottom:5px; padding:6px; border:1px solid #bf953f; border-radius:4px; font-size:0.8rem;">
 
-                        <input type="text" id="ghPath" value="data.json" placeholder="Tên file lưu trữ (VD: data.json)"
-                            style="width:100%; margin-bottom:5px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size:0.8rem;">
+                        <input type="text" id="ghPath" value="data.json"
+                            style="width:100%; margin-bottom:5px; padding:6px; border:1px solid #bf953f; border-radius:4px; font-size:0.8rem;">
 
                         <div style="display:flex; gap:5px;">
-                            <button id="ghSaveConfigBtn"
-                                style="flex:1; padding:4px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.8rem;">Lưu
-                                Cấu Hình</button>
-                            <button id="ghSyncBtn"
-                                style="flex:1; padding:4px; background:#16a34a; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.8rem;">Đồng
-                                bộ Ngay</button>
+                            <button id="ghSaveConfigBtn" class="royal-cloud-btn" style="flex:1;">LƯU CẤU HÌNH</button>
+                            <button id="ghSyncBtn" class="royal-cloud-btn" style="flex:1;">ĐỒNG BỘ NGAY</button>
                         </div>
                     </div>
 
-                    <div id="ghStatus" style="font-size:0.7rem; color:#64748b; margin-top:5px; font-style:italic;">Chưa
-                        cấu hình</div>
+                    <div id="ghStatus"
+                        style="font-size:0.65rem; color:#856404; margin-top:5px; font-style:italic; font-family:serif;">
+                        Đang kết nối...</div>
                 </div>
 
 
 
-                <div class="control-group">
-                    <label for="startDate">Ngày Bắt Đầu Chu Kỳ</label>
-                    <input type="date" id="startDate">
-                    <p class="hint">Chọn ngày bắt đầu (Thứ 2 đầu tiên) của chu kỳ.</p>
+                <!-- Royal Imperial Time Hub -->
+                <div class="time-control-hub">
+                    <div class="hub-title">
+                        <i class="fa-solid fa-crown"></i> ROYAL TIME CENTER
+                    </div>
+
+                    <div class="date-pill-wrapper">
+                        <input type="date" id="startDate" title="Ngày bắt đầu chu kỳ">
+                        <button id="todayBtn" class="btn-today-pro" title="Về tháng hiện tại">
+                            <i class="fa-solid fa-gem"></i>
+                        </button>
+                    </div>
+
+                    <div class="month-dial">
+                        <button id="prevMonthBtn" class="dial-btn" title="Tháng trước">
+                            <i class="fa-solid fa-circle-chevron-left"></i>
+                        </button>
+                        <span id="currentMonthLabel" class="dial-label">...</span>
+                        <button id="nextMonthBtn" class="dial-btn" title="Tháng sau">
+                            <i class="fa-solid fa-circle-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="control-group" id="staffPanel"
-                    style="padding: 0.5rem; background: #f0fdf4; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #bbf7d0;">
+                <!-- Royal Algorithm Engine Panel -->
+                <div class="royal-algorithm-panel">
+                    <label class="algorithm-title">
+                        <i class="fa-solid fa-gears"></i> THUẬT TOÁN ĐIỀU PHỐI
+                    </label>
+                    <select id="algorithmSelect" class="royal-select">
+                        <option value="auto">🔄 Tự động (Theo số người)</option>
+                        <option value="pair">👥 Ghép Cặp (Số chẵn)</option>
+                        <option value="roundrobin">🔁 Luân Chuyển (Số lẻ)</option>
+                    </select>
+                    <p class="royal-algorithm-hint" id="algorithmHint">Trí tuệ hoàng gia tự động chọn thuật toán tối ưu.
+                    </p>
+                </div>
 
+                <!-- Royal Staff Registry Panel -->
+                <div class="royal-registry-panel">
                     <div id="staffToggleHeader"
                         style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                        <label
-                            style="font-weight:bold; font-size:0.8rem; color:#15803d; cursor:pointer; margin-bottom:0;">👤
-                            Danh Sách Nhân Viên</label>
+                        <label class="registry-title" style="cursor:pointer; margin-bottom:0;">
+                            <i class="fa-solid fa-scroll"></i> DANH SÁCH NHÂN VIÊN
+                        </label>
                         <span id="staffChevron"
-                            style="font-size:0.7rem; color:#15803d; transition: transform 0.3s;">▼</span>
+                            style="font-size:0.75rem; color:#bf953f; transition: transform 0.3s;">▼</span>
                     </div>
 
                     <div id="staffConfigContent" style="display:none; margin-top:10px;">
-                        <div
-                            style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; min-height: 150px; width: 100%;">
-                            <!-- Column 1: Quick Suggestions -->
-                            <div id="quickSelectPanel" class="mobile-no-scroll"
-                                style="background: #f8fafc; padding: 0.5rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
-                                <p
-                                    style="font-size: 0.7rem; color: #64748b; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px;">
-                                    ✨ Gợi ý nhanh:
-                                </p>
-                                <div id="quickStaffContainer"
-                                    style="display: flex; flex-wrap: wrap; gap: 12px 8px; margin-bottom: 10px; padding: 10px 5px 5px 5px;">
-                                    <!-- Chips will be injected by JS -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Suggestions Area -->
+                            <div id="quickSelectPanel"
+                                style="position: relative; border-bottom: 1px solid #fcf6ba; padding-bottom: 8px;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <p
+                                        style="font-size: 0.75rem; color: #856404; font-weight: 900; display: flex; align-items: center; gap: 5px; margin: 0; font-family: serif;">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> GỢI Ý:
+                                    </p>
+                                    <div id="addSuggestToggle"
+                                        style="cursor: pointer; font-size: 0.65rem; color: #aa771c; font-weight: bold; text-decoration: underline;">
+                                        + Thêm Tên
+                                    </div>
                                 </div>
 
-                                <!-- Input to add more -->
-                                <div style="display: flex; gap: 4px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
-                                    <input type="text" id="newSuggestInput" placeholder="Thêm tên..."
-                                        style="flex: 1; padding: 4px; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                                <div id="quickStaffContainer" class="royal-chip-container"
+                                    style="max-height: 100px; overflow-y: auto;">
+                                    <!-- Royal chips will be injected here -->
+                                </div>
+
+                                <div id="addSuggestForm"
+                                    style="display: none; gap: 4px; border-top: 1px dotted #bf953f; padding-top: 6px; margin-top: 4px;">
+                                    <input type="text" id="newSuggestInput" placeholder="Tên quân thần..."
+                                        style="flex: 1; padding: 5px; font-size: 0.8rem; border: 1px solid #bf953f; border-radius: 4px; background: white;">
                                     <button id="addSuggestBtn"
-                                        style="padding: 2px 8px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">+</button>
+                                        style="padding: 2px 10px; background: #bf953f; color: white; border: none; border-radius: 4px; cursor: pointer;">+</button>
                                 </div>
                             </div>
 
-                            <div style="display: flex; flex-direction: column;">
-                                <textarea id="staffInput" style="flex: 1; min-height: 120px;"
-                                    placeholder="Tên sẽ hiện ở đây khi bạn bấm gợi ý..."></textarea>
-                            </div>
+                            <!-- Main Input Area -->
+                            <textarea id="staffInput" class="royal-textarea"
+                                placeholder="Nhập tên các quân thần tại đây..."></textarea>
+
+                            <button id="saveStaffBtn" class="royal-save-btn">
+                                <i class="fa-solid fa-stamp"></i> PHÊ DUYỆT & TẠO LỊCH
+                            </button>
                         </div>
-
-                        <!-- Save Button -->
-                        <button id="saveStaffBtn" class="primary-btn" style="margin-top: 10px; width: 100%;">Lưu & Tạo
-                            Lịch</button>
-                        <p class="hint" style="margin-top: 5px;">*Nhập đúng thứ tự cặp để thuật toán chạy đúng. Bấm tên
-                            bên trái để chọn nhanh.</p>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    <label>Điều hướng tháng</label>
-                    <div class="month-nav">
-                        <button id="prevMonthBtn">&lt;</button>
-                        <span id="currentMonthLabel">...</span>
-                        <button id="nextMonthBtn">&gt;</button>
+
+
+                <!-- Royal Statistics Panel -->
+                <div id="statsPanel" class="royal-stats-panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
+                        id="statsToggleHeader">
+                        <label class="stats-title-royal" id="statsLabel">
+                            📊 THỐNG KÊ HOÀNG GIA
+                        </label>
+                        <span id="statsChevron"
+                            style="font-size:0.75rem; color:#bf953f; transition: transform 0.3s;">▼</span>
+                    </div>
+                    <div id="statsContent" style="display:none; margin-top:10px;">
+                        <div id="statsTable" style="font-size: 0.8rem; color: #78350f;">
+                            <!-- Stats will be injected here -->
+                        </div>
+                        <p style="font-size: 0.7rem; color: #92400e; margin-top: 8px; font-style: italic;">
+                            * Tính từ ngày bắt đầu chu kỳ
+                        </p>
                     </div>
                 </div>
-
-                <button id="todayBtn" class="secondary-btn">Về Tháng Hiện Tại</button>
 
                 <!-- Sidebar Footer Removed -->
             </div>
@@ -157,27 +197,24 @@
         <main class="main-content">
             <div class="main-card">
                 <header class="top-bar">
+                    <div class="stars-container"></div> <!-- Starry Background Effect -->
+
                     <div class="header-left">
                         <h2 id="headerTitle">Tháng ...</h2>
-                        <div class="rgb-text">HAVE A NICE DAY! 🌟</div>
-                        <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 2px; font-style: italic;">Phát triển
-                            bởi Tân Nguyễn</div>
+
                     </div>
 
                     <div class="header-right">
-
-                        <div class="legend">
-                            <div class="export-controls">
-                                <button id="exportWord" class="btn-vip btn-word" title="Xuất Word">
-                                    <i class="fa-solid fa-file-word"></i> <span>Word</span>
-                                </button>
-                                <button id="exportExcel" class="btn-vip btn-excel" title="Xuất Excel">
-                                    <i class="fa-solid fa-file-excel"></i> <span>Excel</span>
-                                </button>
-                                <button id="exportPDF" class="btn-vip btn-pdf" title="Xuất PDF">
-                                    <i class="fa-solid fa-file-pdf"></i> <span>PDF</span>
-                                </button>
-                            </div>
+                        <div class="header-toolbar">
+                            <button id="exportWord" class="btn-vip btn-word" title="Xuất Word">
+                                <i class="fa-solid fa-file-word"></i> <span>Word</span>
+                            </button>
+                            <button id="exportExcel" class="btn-vip btn-excel" title="Xuất Excel">
+                                <i class="fa-solid fa-file-excel"></i> <span>Excel</span>
+                            </button>
+                            <button id="exportPDF" class="btn-vip btn-pdf" title="Xuất PDF">
+                                <i class="fa-solid fa-file-pdf"></i> <span>PDF</span>
+                            </button>
                             <div id="digitalClock" class="digital-clock">00:00:00</div>
                         </div>
                     </div>
@@ -215,7 +252,7 @@
                     <div class="premium-divider"></div>
                     <div class="premium-quote">"Code một lần - Dùng một đời"</div>
                     <div class="premium-divider"></div>
-                    <div class="premium-version-tag">v4.7.0 Stable</div>
+                    <div class="premium-version-tag">v5.0.1 ULTIMATE</div>
                 </div>
             </footer>
         </main>

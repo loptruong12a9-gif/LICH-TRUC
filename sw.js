@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lich-truc-v4.7.0-premium-footer';
+const CACHE_NAME = 'lich-truc-v5.0.1-ultimate';
 const ASSETS = [
     './',
     './index.html',

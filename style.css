@@ -40,6 +40,8 @@ body {
     width: 100%;
     max-width: 100vw;
     position: relative;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
 }
 
 html {
@@ -55,6 +57,7 @@ html {
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
+    position: relative;
 }
 
 /* --- SIDEBAR --- */
@@ -72,83 +75,84 @@ html {
 }
 
 .brand {
-    padding: 1rem;
-    /* Reduced padding */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: var(--primary-gradient);
-    color: white;
-    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    padding-top: calc(1rem + env(safe-area-inset-top));
-    /* Handle Notch */
-    padding-left: calc(1rem + env(safe-area-inset-left));
+    padding: 1.5rem 1rem;
+    background: linear-gradient(135deg, #fffdf5 0%, #fff9e6 100%);
+    border-bottom: 2px solid #bf953f;
+    text-align: center;
+    padding-top: calc(1.5rem + env(safe-area-inset-top));
 }
 
 .brand-logo {
-    width: 60px;
-    /* Reduced from 80px */
-    height: 60px;
+    width: 65px;
+    height: 65px;
     border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: white;
-}
-
-/* --- RGB TEXT ANIMATION --- */
-.rgb-text {
-    font-weight: bold;
-    text-transform: uppercase;
-    background: linear-gradient(to right,
-            #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: rgb-sweep 3s linear infinite;
-    display: inline-block;
-    letter-spacing: 1px;
-    font-size: 0.9rem;
-    margin-top: 5px;
-}
-
-@keyframes rgb-sweep {
-    to {
-        background-position: 200% center;
-    }
+    border: 3px solid #bf953f;
+    box-shadow: 0 4px 15px rgba(191, 149, 63, 0.3);
+    margin-bottom: 0.8rem;
+    padding: 3px;
+    background: white;
 }
 
 .brand-text {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 4px;
 }
 
-.hospital-name {
-    font-size: 0.7rem;
-    opacity: 0.9;
-    letter-spacing: 0.05em;
-    font-weight: 500;
-}
-
-.dept-name {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    transition: color 0.3s ease;
-}
-
-.app-name {
-    margin-top: 0.25rem;
-    font-size: 1.1rem;
-    /* Reduced */
+.brand-text h1.hospital-name {
+    font-size: 0.75rem;
+    color: #422006;
+    /* Much darker and sharper */
     font-weight: 800;
-    color: #fbbf24;
+    margin: 0;
+    letter-spacing: 0.02em;
+    font-family: serif;
     text-transform: uppercase;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.brand-text h2.department-name {
+    font-size: 0.95rem;
+    color: #422006;
+    /* Darker */
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 0.05em;
+    font-family: serif;
+    text-transform: uppercase;
+}
+
+.brand-text .app-name {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #854d0e;
+    /* Solid dark gold/bronze */
+    margin: 4px 0;
+    font-family: serif;
+    letter-spacing: 1px;
+}
+
+.version-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #bf953f, #aa771c);
+    color: white;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    margin-top: 5px;
+    border: 1px solid #fcf6ba;
+    box-shadow: 0 2px 5px rgba(191, 149, 63, 0.2);
+}
+
+/* --- RGB TEXT ANIMATION --- */
+@keyframes rgb-sweep {
+    to {
+        background-position: 200% center;
+    }
 }
 
 .sidebar-content {
@@ -240,6 +244,156 @@ textarea {
     border-color: #94a3b8;
 }
 
+/* Royal Imperial Time Hub - Upgraded to Gold 9999 */
+.time-control-hub {
+    background: linear-gradient(135deg, #ffffff 0%, #fffdf0 100%);
+    border: 2px solid #bf953f;
+    border-radius: 15px;
+    position: relative;
+    padding: 15px;
+    margin-bottom: 1.5rem;
+    box-shadow:
+        0 4px 15px rgba(191, 149, 63, 0.2),
+        inset 0 0 10px rgba(251, 245, 183, 0.3);
+    overflow: hidden;
+    animation: goldGlowPulse 4s ease-in-out infinite;
+}
+
+@keyframes goldGlowPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 15px rgba(191, 149, 63, 0.15);
+        border-color: #bf953f;
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(191, 149, 63, 0.3);
+        border-color: #d4af37;
+    }
+}
+
+.hub-title {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #422006;
+    /* Darker */
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-bottom: 2px solid #bf953f;
+    padding-bottom: 5px;
+    font-family: serif;
+    white-space: nowrap;
+    /* Force single line */
+}
+
+.date-pill-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#startDate {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #bf953f;
+    padding: 10px;
+    border-radius: 4px;
+    font-family: serif;
+    /* Classic royal feel */
+    font-weight: 700;
+    color: #856404;
+    outline: none;
+    box-shadow: 0 2px 5px rgba(184, 134, 11, 0.1);
+}
+
+.btn-today-pro {
+    background: linear-gradient(135deg, #bf953f, #aa771c);
+    color: white;
+    border: 1px solid #fcf6ba;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(191, 149, 63, 0.4);
+}
+
+.btn-today-pro:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+.btn-vip {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease;
+    /* Bouncy & Smooth */
+    border: none;
+    color: white;
+    cursor: pointer;
+    will-change: transform;
+    /* Optimize for 120Hz */
+}
+
+.btn-vip:active {
+    transform: scale(0.92);
+}
+
+.month-dial {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fffdf5;
+    padding: 5px;
+    border: 1px solid #fcf6ba;
+}
+
+.dial-btn {
+    background: transparent;
+    border: none;
+    color: #bf953f;
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dial-btn:hover {
+    color: #aa771c;
+    transform: scale(1.2);
+}
+
+.dial-label {
+    font-size: 0.95rem;
+    /* Larger */
+    font-weight: 900;
+    color: #5d4037;
+    /* Even darker brown/bronze */
+    font-family: serif;
+    white-space: nowrap;
+    /* Keep on one line */
+}
+
+/* Clean up faulty styles */
 .month-nav {
     display: flex;
     align-items: center;
@@ -324,12 +478,15 @@ textarea {
     align-items: center;
     gap: 15px;
     padding: 6px 16px;
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 100px;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    gap: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #fffdf5 100%);
+    border: 2px solid #bf953f;
+    padding: 8px 24px;
+    border-radius: 50px;
+    /* Capsule Shape */
+    box-shadow: 0 4px 20px rgba(191, 149, 63, 0.15);
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .premium-brand {
@@ -339,60 +496,66 @@ textarea {
 }
 
 .premium-avatar {
-    width: 24px;
-    height: 24px;
-    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    background: linear-gradient(135deg, #bf953f, #aa771c);
     color: white;
-    border-radius: 6px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.6rem;
+    border-radius: 50%;
+    font-size: 0.65rem;
     font-weight: 900;
+    border: 1px solid #fcf6ba;
 }
 
 .premium-dev-text {
-    font-size: 0.8rem;
-    color: #475569;
-    letter-spacing: 0.02em;
-}
-
-.premium-dev-text strong {
-    background: linear-gradient(to right, #1e3a8a, #2563eb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
+    font-size: 0.75rem;
+    color: #5d4037;
+    white-space: nowrap;
 }
 
 .premium-divider {
     width: 1px;
-    height: 12px;
-    background: #e2e8f0;
+    height: 15px;
+    background: #bf953f;
+    opacity: 0.5;
 }
 
-.premium-contact .premium-link {
+.premium-link {
+    font-size: 0.75rem;
+    color: #714b0b;
     text-decoration: none;
-    color: #2563eb;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: opacity 0.2s;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .premium-quote {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-style: italic;
-    color: #94a3b8;
+    font-weight: 800;
+    color: #b38728;
+    white-space: nowrap;
 }
 
 .premium-version-tag {
-    font-size: 0.8rem;
-    color: #b45309;
-    background: #fffbeb;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 700;
-    border: 1px solid #fef3c7;
+    font-size: 0.7rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #bf953f, #aa771c);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+@keyframes rgbMove {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
 }
 
 @media (max-width: 768px) {
@@ -678,68 +841,242 @@ tr.is-holiday {
     color: white;
     border-bottom: 3px solid rgba(0, 0, 0, 0.1);
     height: auto;
-    min-height: 70px;
+    min-height: 85px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Twinkling Stars Effect */
+.stars-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.stars-container::before,
+.stars-container::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+        radial-gradient(1px 1px at 20% 30%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 40% 70%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 50% 20%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 80% 40%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 90% 90%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 10% 80%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 30% 10%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 60% 50%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 70% 20%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 15% 45%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 25% 65%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 35% 85%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 45% 15%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 55% 35%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 65% 75%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 75% 95%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 85% 55%, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 95% 25%, #fff, rgba(0, 0, 0, 0));
+    background-size: 400px 400px;
+    animation: twinkle 4s ease-in-out infinite;
+    opacity: 0.3;
+    will-change: opacity, transform;
+}
+
+.stars-container::after {
+    animation-duration: 6s;
+    animation-delay: 1s;
+    background-size: 300px 300px;
+    opacity: 0.2;
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+/* Royal Sky Blue Capsule Header - Compact & Sleek */
+.top-bar {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    border: 1px solid #7dd3fc;
+    border-bottom: 3px solid #0369a1;
+    padding: 0.6rem 1.2rem;
+    /* Compact padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.15);
+    border-radius: 12px;
+    /* Rounded corners */
+    margin: 10px 10px 5px 10px;
+    /* Floating look */
+    overflow: hidden;
+}
+
+.top-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
 }
 
 .header-left {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    /* Align items on one line */
+    gap: 15px;
+    z-index: 11;
 }
 
-.top-bar h2 {
-    font-size: 1.3rem;
-    /* Slightly larger heading */
-    margin-bottom: 0.2rem;
-}
-
-/* Rainbow Greeting */
-.greeting-text {
-    font-size: 0.9rem;
+#headerTitle {
+    color: #ffffff;
+    font-family: serif;
+    font-size: 1.6rem;
+    /* Increased size */
     font-weight: 900;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: linear-gradient(to right, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0088ff, #ff00ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 0px rgba(255, 255, 255, 0.9));
-    /* White hard shadow to make it pop against blue */
-    animation: rainbowMove 5s linear infinite;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    margin: 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-    /* Constrain on narrow screens */
+    /* Prevent wrapping */
 }
 
-@keyframes rainbowMove {
-    0% {
-        filter: hue-rotate(0deg) drop-shadow(0 2px 0px rgba(255, 255, 255, 0.9));
-    }
-
-    100% {
-        filter: hue-rotate(360deg) drop-shadow(0 2px 0px rgba(255, 255, 255, 0.9));
-    }
+.rgb-text {
+    font-size: 0.7rem;
+    color: #f0f9ff !important;
+    font-family: serif;
+    font-style: italic;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 0;
 }
 
 .header-right {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: flex-end;
+    margin-top: 0;
+    z-index: 11;
 }
 
-/* legend and export controls */
-.legend {
+.header-toolbar {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-}
-
-.export-controls {
-    display: flex;
     gap: 8px;
-    align-items: center;
+    /* Tight gap */
+}
+
+/* Platinum Glass Elements Support */
+.digital-clock {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #7dd3fc;
+    color: #0369a1;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 800;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 5px rgba(14, 165, 233, 0.1);
+    white-space: nowrap;
+}
+
+
+
+/* Royal Sky Blue Table Design */
+#rosterTable {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #7dd3fc;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+#rosterTable thead th {
+    background: linear-gradient(to bottom, #0369a1, #075985);
+    color: #ffffff;
+    font-family: serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 12px 10px;
+    border-bottom: 2px solid #0c4a6e;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+#rosterTable tbody td {
+    border-bottom: 1px solid #e0f2fe;
+    border-right: 1px solid #e0f2fe;
+    padding: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+#rosterTable tbody tr:nth-child(even) {
+    background-color: #fffaf0;
+}
+
+#rosterTable tbody tr:hover {
+    background-color: #f0f9ff;
+    transition: background 0.2s;
+}
+
+.col-time {
+    background-color: #f8fafc;
+    color: #0369a1 !important;
+    font-weight: 800 !important;
+    border-right: 2px solid #7dd3fc !important;
+}
+
+/* Sunday Royal Style */
+#rosterTable tbody tr.is-sunday td,
+#rosterTable tbody tr.is-sunday .col-time {
+    color: #d90429 !important;
+    /* Crimson Red */
+    font-weight: 800 !important;
+}
+
+#rosterTable tbody tr.is-sunday .col-time {
+    background-color: #fff5f5 !important;
+    border-right: 2px solid #ffcdd2 !important;
+}
+
+/* Sunday/Saturday Royal Style */
+.sun {
+    background-color: #fff1f2 !important;
+    color: #e11d48 !important;
+    /* Royal Red */
+}
+
+.sat {
+    background-color: #f0f9ff !important;
+    color: #0284c7 !important;
+    /* Royal Blue */
 }
 
 .btn-vip {
@@ -843,6 +1180,156 @@ tr.is-holiday {
     text-align: center;
 }
 
+/* Royal Staff Registry Styles */
+.royal-registry-panel {
+    background: #fffdf5;
+    border: 2px solid #bf953f;
+    border-radius: 12px;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+    animation: goldGlowPulse 5s ease-in-out infinite;
+}
+
+.registry-title {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #714b0b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-family: serif;
+    border-bottom: 2px solid #bf953f;
+    padding-bottom: 5px;
+}
+
+@keyframes goldTextPulse {
+
+    0%,
+    100% {
+        filter: brightness(1) drop-shadow(0 0 2px rgba(191, 149, 63, 0.3));
+    }
+
+    50% {
+        filter: brightness(1.5) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+    }
+}
+
+.royal-chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.royal-textarea {
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid #bf953f;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.85rem;
+    background: white;
+    box-shadow: inset 0 2px 4px rgba(191, 149, 63, 0.05);
+    outline: none;
+    transition: all 0.2s;
+    font-family: sans-serif;
+}
+
+.royal-textarea:focus {
+    border-color: #aa771c;
+    box-shadow: 0 0 0 3px rgba(191, 149, 63, 0.1);
+}
+
+.royal-save-btn {
+    background: linear-gradient(135deg, #bf953f, #aa771c);
+    color: white !important;
+    border: 1px solid #fcf6ba;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(191, 149, 63, 0.3);
+    transition: all 0.2s;
+    font-family: serif;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.royal-save-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 15px rgba(191, 149, 63, 0.4);
+}
+
+/* Royal Algorithm Engine Styles */
+.royal-algorithm-panel {
+    background: #fffdf5;
+    border: 2px solid #bf953f;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    animation: goldGlowPulse 6s ease-in-out infinite;
+}
+
+.algorithm-title {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #714b0b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-family: serif;
+}
+
+.royal-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bf953f;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: white;
+    color: #5d4037;
+    /* Consistent with other labels */
+    font-weight: 800;
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(191, 149, 63, 0.05);
+    transition: all 0.2s;
+    font-family: serif;
+    /* Royal alignment */
+}
+
+.royal-select:focus {
+    border-color: #aa771c;
+    box-shadow: 0 0 0 3px rgba(191, 149, 63, 0.1);
+}
+
+.royal-algorithm-hint {
+    font-size: 0.7rem;
+    /* Slightly larger */
+    color: #714b0b;
+    /* Darker bronze */
+    margin-top: 8px;
+    font-style: italic;
+    font-weight: 700;
+    text-align: center;
+    border-top: 1px dotted #fcf6ba;
+    padding-top: 6px;
+    font-family: serif;
+    /* Royal alignment */
+}
+
 /* --- MOBILE RESPONSIVE --- */
 @media (max-width: 768px) {
     body {
@@ -944,23 +1431,38 @@ tr.is-holiday {
     }
 
     .top-bar {
-        padding: 0.5rem;
+        padding: 0.4rem 0.8rem;
         padding-top: calc(0.5rem + env(safe-area-inset-top));
-        padding-left: calc(0.5rem + env(safe-area-inset-left));
-        padding-right: calc(0.5rem + env(safe-area-inset-right));
-        flex-direction: column;
-        gap: 0.5rem;
-        min-height: auto;
-    }
-
-    .header-left,
-    .header-right {
-        width: 100%;
+        flex-direction: row;
+        /* Force row on mobile too */
         justify-content: space-between;
+        gap: 0.3rem;
+        min-height: auto;
+        border-radius: 10px;
+        margin: 8px 8px 4px 8px;
     }
 
-    .greeting-text {
-        font-size: 0.8rem;
+    .header-left {
+        gap: 8px;
+    }
+
+    #headerTitle {
+        font-size: 1.15rem;
+        /* Increased for mobile */
+    }
+
+    .rgb-text {
+        display: none;
+        /* Hide subtitle on small screens */
+    }
+
+    .export-controls span {
+        display: none;
+        /* Hide button text, show only icons on mobile */
+    }
+
+    .btn-vip {
+        padding: 5px 8px;
     }
 
     th,
@@ -983,4 +1485,62 @@ tr.is-holiday {
     .credits {
         margin-bottom: 1rem;
     }
+}
+
+/* Royal Stats Panel Upgraded */
+.royal-stats-panel {
+    margin-top: 1rem;
+    padding: 12px;
+    background: #fffdf5;
+    border: 2px solid #bf953f;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    animation: goldGlowPulse 7s ease-in-out infinite;
+}
+
+.stats-title-royal {
+    font-weight: 900;
+    font-size: 0.85rem;
+    color: #5d4037;
+    /* Darker brown/bronze */
+    cursor: pointer;
+    font-family: serif;
+}
+
+/* Royal Cloud Panel */
+.royal-cloud-panel {
+    background: #fffdf5;
+    border: 2px solid #bf953f;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    animation: goldGlowPulse 8s ease-in-out infinite;
+}
+
+.cloud-title-royal {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #714b0b;
+    text-transform: uppercase;
+    font-family: serif;
+}
+
+.royal-cloud-btn {
+    background: linear-gradient(135deg, #bf953f, #aa771c);
+    color: white !important;
+    border: 1px solid #fcf6ba;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.royal-cloud-btn:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
 }

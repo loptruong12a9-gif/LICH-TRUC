@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const STORAGE_KEY_START_DATE = 'dutyRoster_startDate';
     const STORAGE_KEY_GITHUB = 'dutyRoster_github';
     const STORAGE_KEY_SUGGESTIONS = 'dutyRoster_suggestions';
+    const STORAGE_KEY_ALGORITHM = 'dutyRoster_algorithm';
 
     // --- State Management ---
     let state = {
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         viewDate: new Date(),
         logoBase64: null,
         isAdmin: true, // Always admin mode
+        algorithm: 'auto', // 'auto', 'pair', or 'roundrobin'
         githubConfig: {
             token: GITHUB_DEFAULT_TOKEN,
             owner: GITHUB_DEFAULT_REPO.split('/')[0] || '',
@@ -44,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = {
         staffInput: document.getElementById('staffInput'),
         startDateInput: document.getElementById('startDate'),
+        algorithmSelect: document.getElementById('algorithmSelect'),
+        algorithmHint: document.getElementById('algorithmHint'),
         saveBtn: document.getElementById('saveStaffBtn'),
         prevMonthBtn: document.getElementById('prevMonthBtn'),
         nextMonthBtn: document.getElementById('nextMonthBtn'),
@@ -115,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const storedStaff = localStorage.getItem(STORAGE_KEY_STAFF);
         const storedDate = localStorage.getItem(STORAGE_KEY_START_DATE);
         const storedSuggestions = localStorage.getItem(STORAGE_KEY_SUGGESTIONS);
+        const storedAlgorithm = localStorage.getItem(STORAGE_KEY_ALGORITHM);
 
         if (storedStaff) {
             state.staffList = JSON.parse(storedStaff);
@@ -148,6 +153,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             state.suggestions = [...SUGGESTED_STAFF];
         }
+
+        // Load algorithm setting
+        if (storedAlgorithm) {
+            state.algorithm = storedAlgorithm;
+            if (el.algorithmSelect) {
+                el.algorithmSelect.value = storedAlgorithm;
+            }
+        }
+        updateAlgorithmHint();
     }
 
     function saveSettings() {
@@ -166,6 +180,13 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem(STORAGE_KEY_START_DATE, newStart.toISOString());
         }
 
+        // Save algorithm setting
+        if (el.algorithmSelect) {
+            state.algorithm = el.algorithmSelect.value;
+            localStorage.setItem(STORAGE_KEY_ALGORITHM, state.algorithm);
+        }
+        updateAlgorithmHint();
+
         render();
 
         // Auto-sync to GitHub if configured
@@ -175,11 +196,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * CORE LOGIC: Pair Rotation
+     * CORE LOGIC: Multi-Algorithm Support
      */
     function getShiftsForDate(targetDate) {
         if (state.staffList.length < 2) return [];
 
+        // Determine which algorithm to use
+        let algorithm = state.algorithm;
+        if (algorithm === 'auto') {
+            // Auto-select based on staff count
+            algorithm = state.staffList.length % 2 === 0 ? 'pair' : 'roundrobin';
+        }
+
+        // Call appropriate algorithm
+        if (algorithm === 'roundrobin') {
+            return getShiftsForDateRoundRobin(targetDate);
+        } else {
+            return getShiftsForDatePair(targetDate);
+        }
+    }
+
+    /**
+     * Algorithm 1: Pair Rotation (For Even Numbers)
+     */
+    function getShiftsForDatePair(targetDate) {
         const staff = state.staffList;
         const pairs = [];
 
@@ -229,7 +269,83 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Algorithm 2: Continuous Flow (For Odd Numbers)
+     * Direct sequence of slots (2 per weekday, 3 per Sunday)
+     * Guaranteed NO back-to-back shifts.
+     */
+    function getShiftsForDateRoundRobin(targetDate) {
+        const staff = state.staffList;
+        const staffCount = staff.length;
+        if (staffCount === 0) return [];
+
+        const oneDay = 24 * 60 * 60 * 1000;
+        const start = new Date(state.startDate);
+        start.setHours(0, 0, 0, 0);
+        const target = new Date(targetDate);
+        target.setHours(0, 0, 0, 0);
+
+        // Calculate total slots used before this day
+        let totalSlotsBefore = 0;
+        let tempDate = new Date(start);
+
+        // Performance Optimization: If the difference is very large, count full weeks
+        const diffTime = target.getTime() - start.getTime();
+        const diffDays = Math.floor(diffTime / oneDay);
+
+        if (diffDays >= 7) {
+            const fullWeeks = Math.floor(diffDays / 7);
+            totalSlotsBefore += fullWeeks * 15; // 6 days * 2 + 1 Sunday * 3
+            tempDate.setDate(tempDate.getDate() + fullWeeks * 7);
+        }
+
+        // Count remaining days
+        while (tempDate < target) {
+            if (tempDate.getDay() === 0) { // Sunday
+                totalSlotsBefore += 3;
+            } else {
+                totalSlotsBefore += 2;
+            }
+            tempDate.setDate(tempDate.getDate() + 1);
+        }
+
+        // Support dates before startDate by using a robust modulo
+        const baseIndex = ((totalSlotsBefore % staffCount) + staffCount) % staffCount;
+        const targetDay = target.getDay();
+
+        if (targetDay === 0) { // SUNDAY
+            // Sunday gets 3 sequential people
+            return [
+                staff[baseIndex],
+                staff[(baseIndex + 1) % staffCount],
+                staff[(baseIndex + 2) % staffCount]
+            ];
+        } else { // MON - SAT
+            // Weekdays get 2 sequential people
+            return [
+                staff[baseIndex],
+                staff[(baseIndex + 1) % staffCount]
+            ];
+        }
+    }
+
     // --- Helpers ---
+    function updateAlgorithmHint() {
+        if (!el.algorithmSelect || !el.algorithmHint) return;
+
+        const algo = el.algorithmSelect.value;
+        const count = state.staffList.length;
+
+        if (algo === 'auto') {
+            const recommended = count % 2 === 0 ? 'Ghép Cặp' : 'Luân Chuyển Vòng';
+            el.algorithmHint.textContent = `Tự động chọn: ${recommended} (${count} người)`;
+        } else if (algo === 'pair') {
+            el.algorithmHint.textContent = 'Ghép cặp người trực. Phù hợp với số chẵn (6, 8, 10...).';
+        } else if (algo === 'roundrobin') {
+            el.algorithmHint.textContent = 'Luân chuyển liên tục. Đảm bảo công bằng và có thời gian nghỉ (cho số lẻ).';
+        }
+    }
+
     function getHolidayName(date) {
         const d = date.getDate();
         const m = date.getMonth() + 1;
@@ -260,10 +376,122 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
+    /**
+     * Calculate shift statistics based on staff count
+     * n people = n weeks
+     */
+    function calculateShiftStats() {
+        if (state.staffList.length === 0) return {};
+
+        const stats = {};
+        state.staffList.forEach(name => stats[name] = 0);
+
+        const oneDay = 24 * 60 * 60 * 1000;
+        const start = new Date(state.startDate);
+        start.setHours(0, 0, 0, 0);
+
+        // Calculate for n weeks where n = number of staff
+        const staffCount = state.staffList.length;
+        const numDays = staffCount * 7; // n weeks = n * 7 days
+
+        for (let i = 0; i < numDays; i++) {
+            const currentDate = new Date(start.getTime() + (i * oneDay));
+            const shifts = getShiftsForDate(currentDate);
+
+            // Count each person from the main shifts (Kíp 1, 2, 3)
+            shifts.forEach(person => {
+                if (person && stats[person] !== undefined) {
+                    stats[person]++;
+                }
+            });
+
+            // IMPORTANT: Count Kíp 4 on Sundays
+            if (currentDate.getDay() === 0) { // Is Sunday
+                const isEven = staffCount % 2 === 0;
+                const offset = isEven ? -1 : -2; // Even: Sat (-1), Odd: Fri (-2)
+
+                const sourceDate = new Date(currentDate);
+                sourceDate.setDate(currentDate.getDate() + offset);
+                const sourceShifts = getShiftsForDate(sourceDate);
+                const s4 = sourceShifts[1] || ''; // Kíp 2
+
+                if (s4 && stats[s4] !== undefined) {
+                    stats[s4]++;
+                }
+            }
+        }
+
+        return stats;
+    }
+
+    function renderStats() {
+        const statsTable = document.getElementById('statsTable');
+        const statsLabel = document.getElementById('statsLabel');
+        if (!statsTable) return;
+
+        // Update label with dynamic week count
+        const staffCount = state.staffList.length;
+        if (statsLabel && staffCount > 0) {
+            statsLabel.textContent = `📊 Thống Kê Ca Trực (${staffCount} Tuần)`;
+        }
+
+        if (state.staffList.length === 0) {
+            if (statsLabel) {
+                statsLabel.textContent = '📊 Thống Kê Ca Trực';
+            }
+            statsTable.innerHTML = '<p style="color: #92400e; font-style: italic;">Chưa có danh sách nhân viên</p>';
+            return;
+        }
+
+        const stats = calculateShiftStats();
+        const total = Object.values(stats).reduce((sum, count) => sum + count, 0);
+
+        let html = '<table style="width: 100%; border-collapse: collapse; margin-top: 5px;">';
+        html += '<thead><tr style="background: #fbbf24; color: #78350f;">';
+        html += '<th style="padding: 4px; text-align: left; border: 1px solid #f59e0b;">Tên</th>';
+        html += '<th style="padding: 4px; text-align: center; border: 1px solid #f59e0b;">Ca</th>';
+        html += '<th style="padding: 4px; text-align: center; border: 1px solid #f59e0b;">Chênh</th>';
+        html += '</tr></thead><tbody>';
+
+        const average = total / staffCount;
+
+        Object.entries(stats)
+            .sort((a, b) => b[1] - a[1]) // Sort by count descending
+            .forEach(([name, count]) => {
+                const deviation = count - average;
+                const deviationText = deviation > 0 ? `+${deviation.toFixed(1)}` : deviation.toFixed(1);
+                const color = Math.abs(deviation) > 0.5 ? '#dc2626' : '#059669';
+
+                html += '<tr>';
+                html += `<td style="padding: 4px; border: 1px solid #fbbf24;">${name}</td>`;
+                html += `<td style="padding: 4px; text-align: center; border: 1px solid #fbbf24; font-weight: bold;">${count}</td>`;
+                html += `<td style="padding: 4px; text-align: center; border: 1px solid #fbbf24; color: ${color}; font-size: 0.7rem;">${deviationText}</td>`;
+                html += '</tr>';
+            });
+
+        html += '</tbody></table>';
+
+        html += `<p style="margin-top: 8px; font-size: 0.75rem; color: #92400e;">`;
+        html += `<strong>Trung bình:</strong> ${average.toFixed(1)} ca/người<br>`;
+        html += `<strong>Tổng:</strong> ${total} ca trong ${staffCount} tuần`;
+        html += `</p>`;
+
+        statsTable.innerHTML = html;
+    }
+
     // --- Rendering ---
     function render() {
-        renderHeader();
-        renderTable();
+        try {
+            renderHeader();
+            renderTable();
+            renderStats();
+        } catch (error) {
+            console.error("Render Error:", error);
+            // Fallback or user notification could go here
+            el.rosterBody.innerHTML = `<tr><td colspan="5" style="color:red; text-align:center; padding:20px;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Đã xảy ra lỗi hiển thị. Vui lòng tải lại trang.
+            </td></tr>`;
+        }
     }
 
     function renderHeader() {
@@ -288,13 +516,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const shifts = getShiftsForDate(currentDate);
 
             // LOGIC KÍP 4: Chỉ hiển thị vào Chủ Nhật (0)
-            // Lấy người Kíp 2 của ngày Thứ 7 trong cùng tuần (Trước đó 1 ngày)
             let s4 = '';
-            if (currentDate.getDay() === 0) { // Is Sunday
-                const satDate = new Date(currentDate);
-                satDate.setDate(currentDate.getDate() - 1); // Back 1 day to Saturday
-                const satShifts = getShiftsForDate(satDate);
-                s4 = satShifts[1] || ''; // Kíp 2 is index 1
+            if (currentDate.getDay() === 0) {
+                const staffCount = state.staffList.length;
+                const isEven = staffCount % 2 === 0;
+                const offset = isEven ? -1 : -2; // Chẵn lấy Thứ 7 (-1), Lẻ lấy Thứ 6 (-2)
+
+                const sourceDate = new Date(currentDate);
+                sourceDate.setDate(currentDate.getDate() + offset);
+                const sourceShifts = getShiftsForDate(sourceDate);
+                s4 = sourceShifts[1] || ''; // Kíp 2
             }
 
             const tr = document.createElement('tr');
@@ -347,30 +578,51 @@ document.addEventListener('DOMContentLoaded', () => {
         el.rosterBody.appendChild(fragment); // Single DOM update
     }
 
-    // --- Event Handlers ---
+    // --- Optimized Event Handling (Memory Management) ---
     function bindEvents() {
-        el.saveBtn.addEventListener('click', () => {
-            saveSettings();
-            alert('Đã cập nhật lịch theo quy luật cặp!');
-        });
+        // Use Event Delegation where possible
+        document.body.addEventListener('click', (e) => {
+            const target = e.target;
 
-        el.prevMonthBtn.addEventListener('click', () => {
-            state.viewDate.setMonth(state.viewDate.getMonth() - 1);
-            render();
-        });
+            // Save Button
+            if (target.id === 'saveBtn' || target.closest('#saveBtn')) {
+                saveSettings();
+                const algoName = state.algorithm === 'pair' ? 'Ghép Cặp' :
+                    state.algorithm === 'roundrobin' ? 'Luân Chuyển Vòng' : 'Tự Động';
+                alert(`Đã cập nhật lịch theo thuật toán: ${algoName}!`);
+                return;
+            }
 
-        el.nextMonthBtn.addEventListener('click', () => {
-            state.viewDate.setMonth(state.viewDate.getMonth() + 1);
-            render();
+            // Navigation Buttons
+            if (target.closest('#prevMonthBtn')) {
+                state.viewDate.setMonth(state.viewDate.getMonth() - 1);
+                render();
+                return;
+            }
+            if (target.closest('#nextMonthBtn')) {
+                state.viewDate.setMonth(state.viewDate.getMonth() + 1);
+                render();
+                return;
+            }
+            if (target.closest('#todayBtn')) {
+                state.viewDate = new Date();
+                render();
+                setTimeout(() => {
+                    const todayRow = document.querySelector('.is-today');
+                    if (todayRow) todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+                return;
+            }
         });
+    }
 
-        el.todayBtn.addEventListener('click', () => {
-            state.viewDate = new Date();
+    // Algorithm selector change
+    if (el.algorithmSelect) {
+        el.algorithmSelect.addEventListener('change', () => {
+            state.algorithm = el.algorithmSelect.value;
+            localStorage.setItem(STORAGE_KEY_ALGORITHM, state.algorithm);
+            updateAlgorithmHint();
             render();
-            setTimeout(() => {
-                const todayRow = document.querySelector('.is-today');
-                if (todayRow) todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
         });
     }
 
@@ -544,6 +796,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `<html ${xmlns}>${head}<body>${content}</body></html>`;
         };
+
+        // Initialize download variables
+        let link;
+        let name;
 
         if (type === 'excel') {
             const workbook = new ExcelJS.Workbook();
@@ -774,6 +1030,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ghEl.content.style.display = isHidden ? 'block' : 'none';
             if (ghEl.chevron) {
                 ghEl.chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+        });
+    }
+
+    // Stats Panel Toggle Logic
+    const statsToggleHeader = document.getElementById('statsToggleHeader');
+    const statsContent = document.getElementById('statsContent');
+    const statsChevron = document.getElementById('statsChevron');
+    if (statsToggleHeader && statsContent) {
+        statsToggleHeader.addEventListener('click', () => {
+            const isHidden = statsContent.style.display === 'none';
+            statsContent.style.display = isHidden ? 'block' : 'none';
+            if (statsChevron) {
+                statsChevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
             }
         });
     }
@@ -1037,38 +1307,37 @@ document.addEventListener('DOMContentLoaded', () => {
             chip.textContent = name;
             chip.appendChild(deleteBtn);
             chip.style.cssText = `
-                padding: 6px 8px;
+                padding: 6px 10px;
+                background: #fffbeb;
+                border: 1px solid #fbbf24;
+                padding: 4px 10px;
                 background: white;
-                border: 1px solid #0284c7;
-                border-radius: 6px;
-                font-size: 0.8rem;
-                font-weight: 600;
+                border: 1px solid #bf953f;
+                border-radius: 4px;
                 cursor: pointer;
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                color: #0369a1;
-                text-align: center;
-                flex: 1;
-                min-width: 85px;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-                user-select: none;
-                position: relative;
-                white-space: nowrap;
-                overflow: hidden;
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #856404;
+                transition: all 0.2s;
                 display: flex;
                 align-items: center;
-                justify-content: center;
+                gap: 5px;
+                box-shadow: 0 2px 4px rgba(191,149,63,0.1);
+                font-family: serif;
             `;
 
             chip.onmouseover = () => {
-                chip.style.background = '#0284c7';
+                chip.style.background = '#bf953f';
                 chip.style.color = 'white';
                 chip.style.transform = 'translateY(-1px)';
+                chip.style.boxShadow = '0 4px 8px rgba(191,149,63,0.2)';
                 deleteBtn.style.display = 'flex';
             };
             chip.onmouseout = () => {
                 chip.style.background = 'white';
-                chip.style.color = '#0369a1';
+                chip.style.color = '#856404';
                 chip.style.transform = 'translateY(0)';
+                chip.style.boxShadow = '0 2px 4px rgba(191,149,63,0.1)';
                 deleteBtn.style.display = 'none';
             };
 
@@ -1120,6 +1389,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add Suggestion Event
     const addSuggestBtn = document.getElementById('addSuggestBtn');
     const newSuggestInput = document.getElementById('newSuggestInput');
+    const addSuggestToggle = document.getElementById('addSuggestToggle');
+    const addSuggestForm = document.getElementById('addSuggestForm');
+
+    if (addSuggestToggle && addSuggestForm) {
+        addSuggestToggle.onclick = () => {
+            const isHidden = addSuggestForm.style.display === 'none';
+            addSuggestForm.style.display = isHidden ? 'flex' : 'none';
+            addSuggestToggle.textContent = isHidden ? '[ Đóng ]' : '[+ Thêm tên]';
+            if (isHidden) newSuggestInput.focus();
+        };
+    }
 
     if (addSuggestBtn && newSuggestInput) {
         addSuggestBtn.onclick = () => {

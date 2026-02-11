@@ -2,7 +2,7 @@
 
 > Ứng dụng quản lý lịch trực y cụ chuyên nghiệp cho Khoa PT-GMHS
 
-[![Version](https://img.shields.io/badge/version-4.7.0-blue.svg)](https://github.com/yourusername/lich-truc)
+[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](https://github.com/yourusername/lich-truc)
 [![PWA](https://img.shields.io/badge/PWA-Ready-green.svg)](https://web.dev/progressive-web-apps/)
 [![License](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 
