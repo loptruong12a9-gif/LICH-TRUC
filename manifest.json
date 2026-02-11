@@ -2,7 +2,7 @@
   "name": "Lịch Trực Y Cụ - BV Hồng Đức III",
   "short_name": "Lịch Trực",
   "description": "Ứng dụng quản lý lịch trực y cụ chuyên nghiệp cho Khoa PT-GMHS",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",

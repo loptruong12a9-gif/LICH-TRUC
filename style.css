@@ -255,7 +255,7 @@ textarea {
     box-shadow:
         0 4px 15px rgba(191, 149, 63, 0.2),
         inset 0 0 10px rgba(251, 245, 183, 0.3);
-    overflow: hidden;
+    /* overflow: hidden; Removed */
     animation: goldGlowPulse 4s ease-in-out infinite;
 }
 
@@ -1187,7 +1187,7 @@ tr.is-holiday {
     border-radius: 12px;
     padding: 12px;
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; Removed to prevent cutting off content */
     animation: goldGlowPulse 5s ease-in-out infinite;
 }
 
@@ -1275,7 +1275,7 @@ tr.is-holiday {
     padding: 12px;
     margin-bottom: 1rem;
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; Removed */
     animation: goldGlowPulse 6s ease-in-out infinite;
 }
 
@@ -1393,14 +1393,15 @@ tr.is-holiday {
         display: none;
         padding-top: 0;
         background: #f8fafc;
-        max-height: 85vh;
-        /* Increased from 50vh */
+        max-height: calc(100dvh - 60px);
+        /* Use dynamic viewport height */
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 40px;
-        /* Safe space at bottom */
-        box-shadow: inset 0 -4px 4px -4px rgba(0, 0, 0, 0.1);
+        padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        /* Extra padding for scrolling */
+        overscroll-behavior: contain;
     }
+
 
     .sidebar-content.active {
         display: flex;
@@ -1495,7 +1496,7 @@ tr.is-holiday {
     border: 2px solid #bf953f;
     border-radius: 12px;
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; Removed */
     animation: goldGlowPulse 7s ease-in-out infinite;
 }
 
@@ -1516,7 +1517,7 @@ tr.is-holiday {
     padding: 12px;
     margin-bottom: 1rem;
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; Removed to fix mobile clipping */
     animation: goldGlowPulse 8s ease-in-out infinite;
 }
 
@@ -1543,4 +1544,53 @@ tr.is-holiday {
 .royal-cloud-btn:hover {
     filter: brightness(1.2);
     transform: translateY(-1px);
+}
+
+/* Author RGB Animation */
+@keyframes rainbowText {
+    0% {
+        color: #ff0000;
+    }
+
+    14% {
+        color: #ff7f00;
+    }
+
+    28% {
+        color: #ffff00;
+    }
+
+    42% {
+        color: #00ff00;
+    }
+
+    57% {
+        color: #0000ff;
+    }
+
+    71% {
+        color: #4b0082;
+    }
+
+    85% {
+        color: #9400d3;
+    }
+
+    100% {
+        color: #ff0000;
+    }
+}
+
+.version-badge {
+    animation: rainbowText 3s linear infinite;
+    font-weight: 800;
+    font-size: 0.75rem;
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    /* Light glass background */
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
