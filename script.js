@@ -710,34 +710,21 @@ document.addEventListener('DOMContentLoaded', () => {
             </style>
         `;
 
-        // 1. Prepare Logo
-        let logoImgTag = '';
-        const logoSize = 'width="140" height="140"';
+        // 1. Prepare Logo - DEFINITIVE FIX (Priority: Embedded > State > DOM)
+        // Ensure we always have a valid Base64 string
+        let finalLogoBase64 = state.logoBase64;
 
-        // Use pre-loaded Base64 (from loadDefaultLogo or getBase64Image)
-        if (state.logoBase64) {
-            logoImgTag = `<img src="${state.logoBase64}" ${logoSize} style="width:140px; height:140px; border:0; display:block;">`;
-        } else {
-            // Secondary fallback: Try to grab from the current DOM directly
-            const logoEl = document.querySelector('.brand-logo');
-            if (logoEl && logoEl.naturalWidth > 0) {
-                try {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = logoEl.naturalWidth;
-                    canvas.height = logoEl.naturalHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(logoEl, 0, 0);
-                    const b64 = canvas.toDataURL('image/png');
-                    logoImgTag = `<img src="${b64}" ${logoSize} style="width:140px; height:140px; border:0; display:block;">`;
-                } catch (e) {
-                    console.warn("DOM capture failed, using hardcoded fallback");
-                    logoImgTag = `<img src="${LOGO_BASE64_EMBEDDED}" ${logoSize} style="width:140px; height:140px; border:0; display:block;">`;
-                }
-            } else {
-                // Last dynamic fallback: use the embedded constant directly
-                logoImgTag = `<img src="${LOGO_BASE64_EMBEDDED}" ${logoSize} style="width:140px; height:140px; border:0; display:block;">`;
-            }
+        if (!finalLogoBase64 || finalLogoBase64.length < 100) {
+            console.warn("State logo missing/invalid, utilizing EMBEDDED constant.");
+            finalLogoBase64 = LOGO_BASE64_EMBEDDED;
         }
+
+        // Simplest possible IMG tag for Word compatibility
+        // Avoid complex styles in the tag itself
+        let logoImgTag = `<img src="${finalLogoBase64}" width="140" height="140" style="display:block; width:140px; height:140px;">`;
+
+        // Add a text fallback just in case image rendering fails completely
+        logoImgTag += `<br><span style="font-size:8pt; color:#888; text-decoration:none;">(Logo BV)</span>`;
 
         // Final Text Fallback: Keep alignment if image still fails
         if (!logoImgTag) {
@@ -939,7 +926,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return; // Exit as we used FileSaver
         } else if (type === 'word') {
             const html = getFullHtml(innerContent, 'word');
-            const blob = new Blob([html], { type: 'application/msword' });
+            // Use specific MIME type for Word 2007+ (or standard .doc)
+            // 'application/vnd.ms-word' is more reliable for HTML-to-Word
+            const blob = new Blob([html], { type: 'application/vnd.ms-word' });
             link = URL.createObjectURL(blob);
             name = `LỊCH TRỰC T${state.viewDate.getMonth() + 1}_${state.viewDate.getFullYear()}.doc`;
         } else if (type === 'pdf') {
