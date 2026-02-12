@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
             img.crossOrigin = 'Anonymous';
             const timer = setTimeout(() => {
                 img.src = '';
-                console.warn("getBase64Image timed out for:", imgUrl);
                 resolve(null);
             }, timeoutMs);
 
@@ -103,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.drawImage(img, 0, 0);
                     resolve(canvas.toDataURL('image/jpeg'));
                 } catch (e) {
-                    console.error("Canvas conversion error:", e);
                     resolve(null);
                 }
             };
@@ -115,32 +113,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Embedded Base64 Logo - Guaranteed fallback for mobile/web
-    const LOGO_BASE64_EMBEDDED = "data:image/jpeg;base64,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";
-
     /**
-     * loadDefaultLogo: Robustly loads the hospital logo.
-     * Uses Canvas from file first, falls back to embedded constant.
+     * loadDefaultLogo: Loads the hospital logo.
      */
     async function loadDefaultLogo() {
         if (state.logoBase64) return;
-        console.log("Loading logo...");
 
-        // 1. Try dynamic loading via Image object (best for local updates)
         try {
             const b64 = await getBase64Image('./logo.jpg', 3000);
             if (b64) {
                 state.logoBase64 = b64;
-                console.log("✓ Logo loaded successfully via Canvas from file");
-                return;
             }
         } catch (e) {
-            console.warn("Canvas dynamic logo load failed:", e);
+            console.warn("Logo load failed:", e);
         }
-
-        // 2. Fallback to hardcoded constant (Ultimate guarantee for mobile)
-        console.log("Using hardcoded logo fallback.");
-        state.logoBase64 = LOGO_BASE64_EMBEDDED;
     }
 
     // --- Logic Functions ---
@@ -672,6 +658,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Helper: Convert Image to Base64 (Essential for Word)
+    const getBase64Image = (imgUrl, timeoutMs = 2000) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.setAttribute('crossOrigin', 'anonymous');
+
+            const timer = setTimeout(() => {
+                img.src = ''; // Cancel loading
+                console.warn("getBase64Image timed out for:", imgUrl);
+                resolve(null);
+            }, timeoutMs);
+
+            img.onload = () => {
+                clearTimeout(timer);
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                } catch (e) {
+                    console.error("Canvas conversion error:", e);
+                    resolve(null);
+                }
+            };
+            img.onerror = () => {
+                clearTimeout(timer);
+                resolve(null);
+            };
+            img.src = imgUrl;
+        });
+    };
+
     const exportFile = async (type) => { // Must be async for image
         const table = document.getElementById('rosterTable');
         const title = el.headerTitle.textContent;
@@ -730,12 +750,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const b64 = canvas.toDataURL('image/png');
                     logoImgTag = `<img src="${b64}" ${logoSize} style="width:140px; height:140px; border:0; display:block;">`;
                 } catch (e) {
-                    console.warn("DOM capture failed, using hardcoded fallback");
-                    logoImgTag = `<img src="${LOGO_BASE64_EMBEDDED}" ${logoSize} style="width:140px; height:140px; border:0; display:block;">`;
+                    console.warn("DOM capture failed");
                 }
-            } else {
-                // Last dynamic fallback: use the embedded constant directly
-                logoImgTag = `<img src="${LOGO_BASE64_EMBEDDED}" ${logoSize} style="width:140px; height:140px; border:0; display:block;">`;
             }
         }
 

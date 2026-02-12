@@ -1433,13 +1433,19 @@ tr.is-holiday {
         /* FontAwesome Bars */
         font-family: 'Font Awesome 6 Free';
         font-weight: 900;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+        /* Slightly larger for easier tapping */
         cursor: pointer;
         display: block;
         position: absolute;
-        top: 20px;
-        right: 20px;
+        top: calc(env(safe-area-inset-top) + 15px);
+        /* Account for notch/status bar + 15px padding */
+        right: 15px;
         color: #854d0e;
+        padding: 10px;
+        /* Increase tap area */
+        z-index: 100;
+        /* Ensure it's above other elements */
     }
 
     .main-content {
