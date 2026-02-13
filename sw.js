@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lich-truc-v6.1.0-super-audit';
+const CACHE_NAME = 'lich-truc-v6.2.0-final';
 const ASSETS = [
     './',
     './index.html',

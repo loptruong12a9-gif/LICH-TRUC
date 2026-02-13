@@ -206,6 +206,14 @@
 
                     <div class="header-right">
                         <div class="header-toolbar">
+                            <select id="exportDuration" title="Chọn thời hạn xuất lịch"
+                                style="padding: 6px; border-radius: 6px; border: 1px solid #bf953f; background: #fffdf0; color: #856404; font-weight: bold; margin-right: 5px; cursor: pointer; outline: none;">
+                                <option value="1">📅 1 Tháng</option>
+                                <option value="3">📅 3 Tháng</option>
+                                <option value="6">📅 6 Tháng</option>
+                                <option value="9">📅 9 Tháng</option>
+                                <option value="12">📅 1 Năm</option>
+                            </select>
                             <button id="exportWord" class="btn-vip btn-word" title="Xuất Word">
                                 <i class="fa-solid fa-file-word"></i> <span>Word</span>
                             </button>
@@ -252,7 +260,7 @@
                     <div class="premium-divider"></div>
                     <div class="premium-quote">"Code một lần - Dùng một đời"</div>
                     <div class="premium-divider"></div>
-                    <div class="premium-version-tag">v6.1.0 SUPER AUDIT</div>
+                    <div class="premium-version-tag">v6.2.0 FINAL</div>
                 </div>
             </footer>
         </main>
@@ -291,6 +299,14 @@
                 }
             });
         }
+    </script>
+    <script>
+        window.onerror = function (msg, url, line, col, error) {
+            alert("Global Error: " + msg + "\nLine: " + line);
+        };
+        window.onunhandledrejection = function (event) {
+            alert("Unhandled Promise Error: " + event.reason);
+        };
     </script>
 </body>
 

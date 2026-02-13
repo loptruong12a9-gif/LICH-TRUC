@@ -867,6 +867,7 @@
         });
     };
 
+
     const exportFile = async (type) => { // Must be async for image
         const table = document.getElementById('rosterTable');
         const title = el.headerTitle.textContent;
@@ -995,125 +996,41 @@
         let name;
 
         if (type === 'excel') {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Lich Truc');
+            try {
+                const durationEl = document.getElementById('exportDuration');
+                const duration = durationEl ? parseInt(durationEl.value) || 1 : 1;
 
-            // 1. Add Logo (Native Object)
-            if (logoToUse) {
-                try {
-                    // Safety check for base64 prefix
-                    let b64Data = logoToUse;
-                    if (b64Data.includes(',')) {
-                        b64Data = b64Data.split(',')[1];
+                const workbook = new ExcelJS.Workbook();
+                const logoToUse = await repairLogo();
+
+                // Get Current View Date
+                let currentYear = state.viewDate.getFullYear();
+                let currentMonth = state.viewDate.getMonth();
+
+                for (let i = 0; i < duration; i++) {
+                    // Calculate target month/year
+                    let targetM = currentMonth + i;
+                    let targetY = currentYear;
+                    while (targetM > 11) {
+                        targetM -= 12;
+                        targetY++;
                     }
 
-                    const imageId = workbook.addImage({
-                        base64: b64Data,
-                        extension: 'jpeg',
-                    });
-                    worksheet.addImage(imageId, {
-                        tl: { col: 0, row: 0 },
-                        ext: { width: 100, height: 100 }
-                    });
-                } catch (e) {
-                    console.error("Excel Image Add Error:", e);
-                    // Fail silently in production but log it
+                    const sheetName = `Tháng ${targetM + 1}-${targetY}`;
+                    const worksheet = workbook.addWorksheet(sheetName);
+                    await drawExcelSheet(workbook, worksheet, targetY, targetM, logoToUse);
                 }
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const fileName = duration > 1
+                    ? `LỊCH_TRỰC_T${currentMonth + 1}-${currentYear}_${duration}THANG.xlsx`
+                    : `LỊCH TRỰC T${currentMonth + 1}_${currentYear}.xlsx`;
+                saveAs(new Blob([buffer]), fileName);
+            } catch (error) {
+                console.error("Lỗi xuất Excel:", error);
+                alert("❌ Lỗi xuất file Excel: " + error.message + "\nVui lòng thử lại hoặc báo cho Tân.");
             }
-
-            // 2. Header Text
-            worksheet.mergeCells('B1:E1');
-            worksheet.getCell('B1').value = 'BỆNH VIỆN ĐK HỒNG ĐỨC III';
-            worksheet.getCell('B1').font = { name: 'Times New Roman', size: 16, bold: true, color: { argb: 'FF004D99' } };
-            worksheet.getCell('B1').alignment = { vertical: 'middle', horizontal: 'center' };
-
-            worksheet.mergeCells('B2:E2');
-            worksheet.getCell('B2').value = 'KHOA PT-GMHS';
-            worksheet.getCell('B2').font = { name: 'Times New Roman', size: 15, bold: true, color: { argb: 'FFCC0000' } };
-            worksheet.getCell('B2').alignment = { vertical: 'middle', horizontal: 'center' };
-
-            worksheet.mergeCells('B3:E3');
-            worksheet.getCell('B3').value = 'LỊCH TRỰC Y CỤ';
-            worksheet.getCell('B3').font = { name: 'Times New Roman', size: 14, italic: true };
-            worksheet.getCell('B3').alignment = { vertical: 'middle', horizontal: 'center' };
-
-            worksheet.mergeCells('A5:E5');
-            worksheet.getCell('A5').value = title.toUpperCase();
-            worksheet.getCell('A5').font = { name: 'Times New Roman', size: 20, bold: true };
-            worksheet.getCell('A5').alignment = { vertical: 'middle', horizontal: 'center' };
-
-            // 3. Build Table Headers
-            const headers = ['Thời Gian', 'Kíp 1', 'Kíp 2', 'Kíp 3', 'Kíp 4'];
-            const headerRow = worksheet.getRow(7);
-            headerRow.values = headers;
-            headerRow.font = { name: 'Times New Roman', size: 11, bold: true, color: { argb: 'FF0000FF' } };
-            headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-            headerRow.eachCell((cell) => {
-                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F9FF' } }; // Lightest Sky Blue
-                cell.font = { name: 'Times New Roman', size: 12, bold: true, color: { argb: 'FF0284C7' } }; // Vibrant Blue
-            });
-
-            // 4. Populate Data
-            const rows = table.querySelectorAll('tbody tr');
-            rows.forEach((tr, index) => {
-                const excelRow = worksheet.getRow(8 + index);
-                const cells = tr.querySelectorAll('td');
-                const values = Array.from(cells).map(td => td.textContent.trim());
-                const isSpecial = tr.classList.contains('is-sunday') || tr.classList.contains('is-holiday');
-                excelRow.values = values;
-                excelRow.font = {
-                    name: 'Times New Roman',
-                    size: 11,
-                    bold: isSpecial,
-                    color: isSpecial ? { argb: 'FFFF0000' } : { argb: 'FF000000' }
-                };
-                excelRow.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-                excelRow.eachCell((cell, colNumber) => {
-                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                    // Time column left-aligned
-                    if (colNumber === 1) cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
-                });
-            });
-
-            // 5. Footer Content
-            const lastDataRow = 8 + rows.length;
-            worksheet.mergeCells(`A${lastDataRow + 2}:B${lastDataRow + 2} `);
-            worksheet.getCell(`A${lastDataRow + 2} `).value = 'NGƯỜI LẬP BẢNG';
-            worksheet.getCell(`A${lastDataRow + 2} `).font = { name: 'Times New Roman', bold: true };
-            worksheet.getCell(`A${lastDataRow + 2} `).alignment = { horizontal: 'center' };
-
-            worksheet.mergeCells(`D${lastDataRow + 2}:E${lastDataRow + 2} `);
-            worksheet.getCell(`D${lastDataRow + 2} `).value = 'TRƯỞNG KHOA DUYỆT';
-            worksheet.getCell(`D${lastDataRow + 2} `).font = { name: 'Times New Roman', bold: true };
-            worksheet.getCell(`D${lastDataRow + 2} `).alignment = { horizontal: 'center' };
-
-            worksheet.mergeCells(`A${lastDataRow + 8}:B${lastDataRow + 8} `);
-            worksheet.getCell(`A${lastDataRow + 8} `).value = 'NGUYỄN VĂN TÂN';
-            worksheet.getCell(`A${lastDataRow + 8} `).font = { name: 'Times New Roman', bold: true };
-            worksheet.getCell(`A${lastDataRow + 8} `).alignment = { horizontal: 'center' };
-
-            worksheet.mergeCells(`D${lastDataRow + 8}:E${lastDataRow + 8} `);
-            worksheet.getCell(`D${lastDataRow + 8} `).value = '.........................................';
-            worksheet.getCell(`D${lastDataRow + 8} `).alignment = { horizontal: 'center' };
-
-            worksheet.mergeCells(`A${lastDataRow + 10}:E${lastDataRow + 10} `);
-            worksheet.getCell(`A${lastDataRow + 10} `).value = `Ngày xuất: ${new Date().toLocaleDateString('vi-VN')} `;
-            worksheet.getCell(`A${lastDataRow + 10} `).font = { name: 'Times New Roman', italic: true, size: 10, color: { argb: 'FF666666' } };
-            worksheet.getCell(`A${lastDataRow + 10} `).alignment = { horizontal: 'right' };
-
-            // 6. Column Widths
-            worksheet.getColumn(1).width = 30; // Time column
-            worksheet.getColumn(2).width = 20;
-            worksheet.getColumn(3).width = 20;
-            worksheet.getColumn(4).width = 20;
-            worksheet.getColumn(5).width = 20;
-
-            // 7. Write & Download
-            const buffer = await workbook.xlsx.writeBuffer();
-            const fileName = `LỊCH TRỰC T${state.viewDate.getMonth() + 1}_${state.viewDate.getFullYear()}.xlsx`;
-            saveAs(new Blob([buffer]), fileName);
-            return; // Exit as we used FileSaver
+            return;
         } else if (type === 'word') {
             const html = getFullHtml(innerContent, 'word');
             // Use specific MIME type for Word 2007+ (or standard .doc)
@@ -1624,7 +1541,164 @@
 
     // Load Config on Start
     loadGithubConfig();
+    loadGithubConfig();
+
+
+
+
+
+    // --- MULTI-MONTH EXPORT HELPERS ---
+
+    function generateMonthData(year, month) {
+        const data = [];
+        const lastDay = new Date(year, month + 1, 0);
+        for (let d = 1; d <= lastDay.getDate(); d++) {
+            const currentDate = new Date(year, month, d);
+            const shifts = getShiftsForDate(currentDate);
+
+            // Logic Kíp 4 (Sunday only)
+            let s4 = '';
+            if (currentDate.getDay() === 0) {
+                const staffCount = state.staffList.length;
+                const isEven = staffCount % 2 === 0;
+                const offset = isEven ? -1 : -2;
+                const sourceDate = new Date(currentDate);
+                sourceDate.setDate(currentDate.getDate() + offset);
+                // Recursively get shifts for source date
+                const sourceShifts = getShiftsForDate(sourceDate);
+                s4 = sourceShifts[1] || '';
+            }
+
+            const holiday = getHolidayName(currentDate);
+            data.push({
+                date: currentDate,
+                shifts: shifts,
+                kip4: s4,
+                holiday: holiday,
+                dayOfWeek: currentDate.getDay()
+            });
+        }
+        return data;
+    }
+
+    async function drawExcelSheet(workbook, worksheet, year, month, logoToUse) {
+        const data = generateMonthData(year, month);
+        const monthTitle = `LỊCH TRỰC THÁNG ${month + 1}/${year}`;
+
+        // 1. Add Logo (Native Object)
+        if (logoToUse) {
+            try {
+                let b64Data = logoToUse;
+                if (b64Data.includes(',')) b64Data = b64Data.split(',')[1];
+                const imageId = workbook.addImage({
+                    base64: b64Data,
+                    extension: 'jpeg',
+                });
+                worksheet.addImage(imageId, {
+                    tl: { col: 0, row: 0 },
+                    ext: { width: 100, height: 100 }
+                });
+            } catch (e) {
+                console.error('Excel Image Add Error:', e);
+            }
+        }
+
+        // 2. Header Text
+        worksheet.mergeCells('B1:E1');
+        worksheet.getCell('B1').value = 'BỆNH VIỆN ĐK HỒNG ĐỨC III';
+        worksheet.getCell('B1').font = { name: 'Times New Roman', size: 16, bold: true, color: { argb: 'FF004D99' } };
+        worksheet.getCell('B1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.mergeCells('B2:E2');
+        worksheet.getCell('B2').value = 'KHOA PT-GMHS';
+        worksheet.getCell('B2').font = { name: 'Times New Roman', size: 15, bold: true, color: { argb: 'FFCC0000' } };
+        worksheet.getCell('B2').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.mergeCells('B3:E3');
+        worksheet.getCell('B3').value = 'LỊCH TRỰC Y CỤ';
+        worksheet.getCell('B3').font = { name: 'Times New Roman', size: 14, italic: true };
+        worksheet.getCell('B3').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.mergeCells('A5:E5');
+        worksheet.getCell('A5').value = monthTitle;
+        worksheet.getCell('A5').font = { name: 'Times New Roman', size: 20, bold: true };
+        worksheet.getCell('A5').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // 3. Build Table Headers
+        const headers = ['Thời Gian', 'Kíp 1', 'Kíp 2', 'Kíp 3', 'Kíp 4'];
+        const headerRow = worksheet.getRow(7);
+        headerRow.values = headers;
+        headerRow.font = { name: 'Times New Roman', size: 11, bold: true, color: { argb: 'FF0000FF' } };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        headerRow.eachCell((cell) => {
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F9FF' } };
+            cell.font = { name: 'Times New Roman', size: 12, bold: true, color: { argb: 'FF0284C7' } };
+        });
+
+        // 4. Populate Data
+        data.forEach((day, index) => {
+            const excelRow = worksheet.getRow(8 + index);
+
+            // Format Date String
+            const dateStr = `${day.dayOfWeek === 0 ? 'Chủ Nhật' : 'Thứ ' + (day.dayOfWeek + 1)}, ${day.date.getDate()}/${day.date.getMonth() + 1}`;
+            // Add holiday if exists
+            const timeCell = day.holiday ? `${dateStr} (${day.holiday})` : dateStr;
+
+            const values = [
+                timeCell,
+                day.shifts[0] || '',
+                day.shifts[1] || '',
+                day.shifts[2] || '',
+                day.kip4 || ''
+            ];
+
+            const isSpecial = day.dayOfWeek === 0 || !!day.holiday;
+            excelRow.values = values;
+            excelRow.font = {
+                name: 'Times New Roman',
+                size: 11,
+                bold: isSpecial,
+                color: isSpecial ? { argb: 'FFFF0000' } : { argb: 'FF000000' }
+            };
+            excelRow.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+            excelRow.eachCell((cell, colNumber) => {
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                if (colNumber === 1) cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+            });
+        });
+
+        // 5. Footer Content
+        const lastDataRow = 8 + data.length;
+        worksheet.mergeCells(`A${lastDataRow + 2}:B${lastDataRow + 2} `);
+        worksheet.getCell(`A${lastDataRow + 2} `).value = 'NGƯỜI LẬP BẢNG';
+        worksheet.getCell(`A${lastDataRow + 2} `).font = { name: 'Times New Roman', bold: true };
+        worksheet.getCell(`A${lastDataRow + 2} `).alignment = { horizontal: 'center' };
+
+        worksheet.mergeCells(`D${lastDataRow + 2}:E${lastDataRow + 2} `);
+        worksheet.getCell(`D${lastDataRow + 2} `).value = 'TRƯỞNG KHOA DUYỆT';
+        worksheet.getCell(`D${lastDataRow + 2} `).font = { name: 'Times New Roman', bold: true };
+        worksheet.getCell(`D${lastDataRow + 2} `).alignment = { horizontal: 'center' };
+
+        worksheet.mergeCells(`A${lastDataRow + 8}:B${lastDataRow + 8} `);
+        worksheet.getCell(`A${lastDataRow + 8} `).value = 'NGUYỄN VĂN TÂN';
+        worksheet.getCell(`A${lastDataRow + 8} `).font = { name: 'Times New Roman', bold: true };
+        worksheet.getCell(`A${lastDataRow + 8} `).alignment = { horizontal: 'center' };
+
+        worksheet.mergeCells(`D${lastDataRow + 8}:E${lastDataRow + 8} `);
+        worksheet.getCell(`D${lastDataRow + 8} `).value = '.........................................';
+        worksheet.getCell(`D${lastDataRow + 8} `).alignment = { horizontal: 'center' };
+
+        worksheet.mergeCells(`A${lastDataRow + 10}:E${lastDataRow + 10} `);
+        worksheet.getCell(`A${lastDataRow + 10} `).value = `Ngày xuất: ${new Date().toLocaleDateString('vi-VN')} `;
+        worksheet.getCell(`A${lastDataRow + 10} `).font = { name: 'Times New Roman', italic: true, size: 10, color: { argb: 'FF666666' } };
+        worksheet.getCell(`A${lastDataRow + 10} `).alignment = { horizontal: 'right' };
+
+        // 6. Column Widths
+        worksheet.getColumn(1).width = 30;
+        worksheet.getColumn(2).width = 20;
+        worksheet.getColumn(3).width = 20;
+        worksheet.getColumn(4).width = 20;
+        worksheet.getColumn(5).width = 20;
+    }
 });
-
-
-
