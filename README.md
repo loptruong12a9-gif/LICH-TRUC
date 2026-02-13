@@ -2,7 +2,7 @@
 
 > **Giải pháp quản lý lịch trực chuyên sâu dành cho Khoa PT-GMHS - Bệnh Viện ĐK Hồng Đức III**
 
-![Badge](https://img.shields.io/badge/Version-v6.2.0_FINAL-blue?style=for-the-badge&logo=appveyor)
+![Badge](https://img.shields.io/badge/Version-v6.2.1_FINAL-blue?style=for-the-badge&logo=appveyor)
 ![Badge](https://img.shields.io/badge/Status-STABLE-success?style=for-the-badge)
 ![Badge](https://img.shields.io/badge/PWA-READY-orange?style=for-the-badge)
 
@@ -10,9 +10,9 @@
 
 ## 🌟 Giới Thiệu
 
-**Lịch Trực Y Cụ** là ứng dụng web (Progressive Web App) được thiết kế riêng biệt để tự động hóa quy trình phân công, quản lý và thống kê lịch trực. Phiên bản **v6.2.0 FINAL** là phiên bản hoàn thiện nhất, ổn định và đầy đủ tính năng.
+**Lịch Trực Y Cụ** là ứng dụng web (Progressive Web App) được thiết kế riêng biệt để tự động hóa quy trình phân công, quản lý và thống kê lịch trực. Phiên bản **v6.2.1 FINAL** là phiên bản hoàn thiện nhất, ổn định và đầy đủ tính năng.
 
-## 🚀 Tính Năng Nổi Bật (v6.2.0 FINAL)
+## 🚀 Tính Năng Nổi Bật (v6.2.1 FINAL)
 
 ### 1. 🛡️ Hệ Thống Ổn Định Tuyệt Đối (Super Audit)
 - **UTF-8 Encoding Chuẩn**: Hiển thị tiếng Việt hoàn hảo, không lỗi font trên mọi thiết bị.
@@ -71,7 +71,7 @@
 | :--- | :--- |
 | **Developer** | **Tân Nguyễn** |
 | **Liên hệ** | ☎️ 036.728.7102 |
-| **Phiên bản** | v6.2.0 (Final Edition) |
+| **Phiên bản** | v6.2.1 (Final Edition) |
 | **Triết lý** | *"Code một lần - Dùng một đời"* |
 
 > **Lưu ý**: Đây là tài sản trí tuệ và phần mềm nội bộ. Vui lòng không sao chép hoặc phát tán trái phép.
