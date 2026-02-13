@@ -1455,15 +1455,33 @@ tr.is-holiday {
     }
 
     .top-bar {
-        padding: 0.4rem 0.8rem;
-        padding-top: calc(0.5rem + env(safe-area-inset-top));
-        flex-direction: row;
-        /* Force row on mobile too */
-        justify-content: space-between;
-        gap: 0.3rem;
+        padding: 0.8rem;
+        padding-top: calc(0.8rem + env(safe-area-inset-top));
+        flex-direction: column !important;
+        /* Stack vertically as requested */
+        align-items: center;
+        gap: 0.8rem;
         min-height: auto;
-        border-radius: 10px;
-        margin: 8px 8px 4px 8px;
+        border-radius: 15px;
+        margin: 10px;
+    }
+
+    .header-left {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: center;
+        margin-top: 5px;
+    }
+
+    .header-toolbar {
+        flex-wrap: wrap;
+        /* Ensure buttons wrap on very small screens */
+        justify-content: center;
+        width: 100%;
     }
 
     .header-left {
