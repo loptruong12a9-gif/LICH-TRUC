@@ -928,7 +928,7 @@ tr.is-holiday {
     /* Rounded corners */
     margin: 10px 10px 5px 10px;
     /* Floating look */
-    overflow: hidden;
+    /* overflow: hidden; Removed to fix mobile clipping */
 }
 
 .top-bar::before {
